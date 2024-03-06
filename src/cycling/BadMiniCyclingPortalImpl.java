@@ -13,10 +13,13 @@ import java.time.LocalTime;
  *
  */
 public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
+	public List<Integer> raceIds = new ArrayList<>();
+	public Map<Integer, Race> races = new HashMap<>();
 
 	@Override
 	public int[] getRaceIds() {
-		// TODO Auto-generated method stub
+		int[] raceIdsArray = raceIds.stream().mapToInt(Integer::intValue).toArray();
+		return raceIdsArray;
 		return null;
 	}
 

@@ -19,7 +19,8 @@ import java.util.Map;
 public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	public List<Integer> raceIds = new ArrayList<>();
 	public Map<Integer, Race> races = new HashMap<>();
-<<<<<<< HEAD
+	public Map<Integer, Stage> stages = new HashMap<>();
+
 /////////////////////////////////////////////////////
 	
 
@@ -36,14 +37,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
     public BadMiniCyclingPortalImpl(){
 		this.raceIds = new ArrayList<>();
 		this.races = new HashMap<>();
-=======
 
-	@Override
-	public int[] getRaceIds() {
-		int[] raceIdsArray = raceIds.stream().mapToInt(Integer::intValue).toArray();
-		return raceIdsArray;
-		return null;
->>>>>>> 1d2f854233baa81c29205578bde578e893c949c0
 	}
 
 	@Override
@@ -51,8 +45,6 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		int[] raceIdsArray = raceIds.stream().mapToInt(Integer::intValue).toArray();
 		return raceIdsArray;
 	}
-
-
 
 	@Override
 	public int createRace(String name, String description) throws IllegalNameException, InvalidNameException {

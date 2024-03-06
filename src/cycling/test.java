@@ -3,8 +3,8 @@ package cycling;
 public class test {
     public static void main(String[] args) throws IllegalNameException, InvalidNameException, IDNotRecognisedException {
         MiniCyclingPortal miniCyclingPortal = new BadMiniCyclingPortalImpl();
-        int raceId1 = miniCyclingPortal.createRace("TourFR", "The famous cycling race");
-        int raceId2 = miniCyclingPortal.createRace("TourEU", "The famous cycling race in EU");
+        miniCyclingPortal.createRace("TourFR", "The famous cycling race");
+        miniCyclingPortal.createRace("TourEU", "The famous cycling race in EU");
 
         int[] raceIds = miniCyclingPortal.getRaceIds();
         if (raceIds.length > 0) {

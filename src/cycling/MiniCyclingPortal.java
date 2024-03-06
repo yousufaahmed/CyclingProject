@@ -22,7 +22,6 @@ public interface MiniCyclingPortal extends Serializable {
 	 * @return An array of race IDs in the system or an empty array if none exists.
 	 */
 	int[] getRaceIds();
-
 	/**
 	 * The method creates a staged race in the platform with the given name and
 	 * description.
@@ -33,7 +32,7 @@ public interface MiniCyclingPortal extends Serializable {
 	 * @param name        Race's name.
 	 * @param description Race's description (can be null).
 	 * @throws IllegalNameException If the name already exists in the platform.
-	 * @throws InvalidNameException If the name is null, empty, has more than 30
+	 * @throws InvalidNameException If the name is null,   empty, has more than 30
 	 *                              characters, or has white spaces.
 	 * @return the unique ID of the created race.
 	 * 

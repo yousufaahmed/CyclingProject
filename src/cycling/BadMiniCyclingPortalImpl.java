@@ -3,6 +3,10 @@ package cycling;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BadMiniCyclingPortal is a minimally compiling, but non-functioning implementor
@@ -13,24 +17,68 @@ import java.time.LocalTime;
  *
  */
 public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
+	public List<Integer> raceIds = new ArrayList<>();
+	public Map<Integer, Race> races = new HashMap<>();
+/////////////////////////////////////////////////////
+	
 
-	@Override
-	public int[] getRaceIds() {
-		// TODO Auto-generated method stub
-		return null;
+	private boolean raceNameExists(String name) {
+		for (Race existingRace : races.values()) {
+			if (existingRace.getName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+///////////////////////////////////////////////////////////////////
+    public BadMiniCyclingPortalImpl(){
+		this.raceIds = new ArrayList<>();
+		this.races = new HashMap<>();
 	}
 
 	@Override
+	public int[] getRaceIds() {
+		int[] raceIdsArray = raceIds.stream().mapToInt(Integer::intValue).toArray();
+		return raceIdsArray;
+	}
+
+
+
+	@Override
 	public int createRace(String name, String description) throws IllegalNameException, InvalidNameException {
-		// TODO Auto-generated method stub
-		return 0;
+		// Check for invalid name
+        if (name == null || name.trim().isEmpty() || name.length() > 30 || name.contains(" ")) {
+            throw new InvalidNameException("name not valid");
+        }
+
+        // Check if the name already exists
+        if (raceNameExists(name)) {
+            throw new IllegalNameException("name already exists");
+        }
+        // create raceID and add to list
+		int raceId = raceIds.size() + 1;
+        raceIds.add(raceId);
+		// Create a Race object and associate it with the raceId
+		Race race = new Race(name, description);
+		races.put(raceId, race);
+
+        return raceId;
 	}
 
 	@Override
 	public String viewRaceDetails(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		if (!races.containsKey(raceId)) {
+            throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
+        }
+
+        Race race = races.get(raceId);
+        String name = race.getName();
+        String description = race.getDescription();
+
+        return "Race ID: " + raceId + "\nName: " + name + "\nDescription: " + description;
+    }
+
 
 	@Override
 	public void removeRaceById(int raceId) throws IDNotRecognisedException {

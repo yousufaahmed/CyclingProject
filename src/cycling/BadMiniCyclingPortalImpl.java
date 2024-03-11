@@ -1,9 +1,11 @@
 package cycling;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,26 +20,38 @@ import java.util.Map;
  */
 public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	public List<Integer> raceIds = new ArrayList<>();
+	public List<Integer> stageIds = new ArrayList<>();
 	public Map<Integer, Race> races = new HashMap<>();
 	public Map<Integer, Stage> stages = new HashMap<>();
+	public Map<Integer, int[]> stagesrace = new HashMap<>();
+
 
 /////////////////////////////////////////////////////
 	
 
 	private boolean raceNameExists(String name) {
 		for (Race existingRace : races.values()) {
-			if (existingRace.getName().equals(name)) {
+			if (existingRace.getName() == name) {
 				return true;
 			}
 		}
 		return false;
 	}
 
+	private boolean stageNameExists(String name) {
+		for (Stage existingStage : stages.values()) {
+			if (existingStage.getstageName() == name) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 ///////////////////////////////////////////////////////////////////
     public BadMiniCyclingPortalImpl(){
 		this.raceIds = new ArrayList<>();
 		this.races = new HashMap<>();
-
 	}
 
 	@Override
@@ -45,6 +59,8 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		int[] raceIdsArray = raceIds.stream().mapToInt(Integer::intValue).toArray();
 		return raceIdsArray;
 	}
+
+
 
 	@Override
 	public int createRace(String name, String description) throws IllegalNameException, InvalidNameException {
@@ -83,43 +99,99 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	@Override
 	public void removeRaceById(int raceId) throws IDNotRecognisedException {
-		if (races.get(raceId) != null){
-            races.remove(raceId);
-        }
-        else{
-            throw new IDNotRecognisedException("raceId doesnt exist");
-        }
+		if (!races.containsKey(raceId)) {
+			throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
+		}
+	
+		races.remove(raceId);
+
 	}
 
 	@Override
 	public int getNumberOfStages(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return 0;
+		if (stagesrace.isEmpty()){
+			return 0;
+		}
+		else if(!stagesrace.containsKey(raceId)) {
+			throw new IDNotRecognisedException("Stage with ID " + raceId + " not found.");
+		}
+		
+		int[] stageArray = stagesrace.get(raceId);
+		int nStages = stageArray.length;
+		return nStages;
 	}
 
 	@Override
 	public int addStageToRace(int raceId, String stageName, String description, double length, LocalDateTime startTime,
 			StageType type)
 			throws IDNotRecognisedException, IllegalNameException, InvalidNameException, InvalidLengthException {
-		// TODO Auto-generated method stub
-		return 0;
+				if (!races.containsKey(raceId)) {
+					throw new IDNotRecognisedException("Race ID not recognized: " + raceId);
+				}
+		
+				// Check for invalid name
+				if (stageName == null || stageName.trim().isEmpty() || stageName.length() > 30 || stageName.contains(" ")) {
+					throw new InvalidNameException("Invalid stage name: " + stageName);
+				}
+		
+				// Check if the name already exists
+				if (stageNameExists(stageName)) {
+					throw new IllegalNameException("Stage name already exists: " + stageName);
+				}
+		
+				// Check for invalid length
+				if (length < 5.0) {
+					throw new InvalidLengthException("Invalid stage length: " + length);
+				}
+
+				// Increment the nextStageId for the next stage
+				int stageId = stageIds.size() + 1;
+                stageIds.add(stageId);
+				// Map the stage to the race
+				Stage stage = new Stage(stageName, description, length, startTime, type);
+				stages.put(stageId, stage);
+				
+				if (getNumberOfStages(raceId) != 0){
+					int[] Originalarray = stagesrace.get(raceId);
+					int[] newArray = Arrays.copyOf(Originalarray,Originalarray.length + 1);
+					newArray[newArray.length - 1] = stageId;
+					stagesrace.replace(raceId, newArray);   
+				}else{
+					int[] newArray = {stageId};
+					stagesrace.put(raceId, newArray);
+				}
+
+				// Return the unique ID of the stage
+				return stageId;
 	}
 
 	@Override
 	public int[] getRaceStages(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (!stagesrace.containsKey(raceId)) {
+			throw new IDNotRecognisedException("Race ID not recognized: " + raceId);
+		}
+		
+		int[] stagesArr = stagesrace.get(raceId);
+
+		return stagesArr;
 	}
 
 	@Override
 	public double getStageLength(int stageId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		if (!stages.containsKey(stageId)) {
+			throw new IDNotRecognisedException("Race ID not recognized: " + stageId);
+		}
+
+		Stage stage = stages.get(stageId);
+		double length = stage.getlength();
+		return length;
 	}
 
 	@Override
 	public void removeStageById(int stageId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
+		
 
 	}
 

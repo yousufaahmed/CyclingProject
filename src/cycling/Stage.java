@@ -8,13 +8,40 @@ public class Stage {
 	private LocalDateTime startTime;
 	private StageType type;
 
-	public double getStageLength(int stageId){
-		return length;
+	public Stage(String stageName, String description, double length, LocalDateTime startTime, StageType type){
+		this.stageName = stageName;
+		this.description = description;
+		this.length = length;
+		this.startTime = startTime;
+		this.type = type;
 	}
 
-	public Stage(String stageName, String description, double length, LocalDateTime startTime, StageType type){
-		this.description = description;
+	public String getstageName() {
+		return stageName;
 	}
+
+	public String getDesciption(){
+		return description;
+	}
+
+	public double getlength(){
+		return length;
+	}  
+
+	public LocalDateTime getstartTime(){
+		return startTime;
+	}
+
+	public StageType gettype(){
+		return type;
+	}
+
+
+    // @Override
+	// public double getStageLength(int stageId) throws IDNotRecognisedException {
+	// 	// TODO Auto-generated method stub
+	// 	return 0;
+	// }
 
 	// @Override
 	// public void removeStageById(int stageId) throws IDNotRecognisedException {

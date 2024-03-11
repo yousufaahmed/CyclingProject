@@ -20,6 +20,8 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	public List<Integer> raceIds = new ArrayList<>();
 	public Map<Integer, Race> races = new HashMap<>();
 	public Map<Integer, Stage> stages = new HashMap<>();
+	public Map<Integer, Stage> stages = new HashMap<>();
+
 /////////////////////////////////////////////////////
 	
 

@@ -1,5 +1,14 @@
 package cycling;
+import java.time.LocalDateTime;
 public class Stage {
+
+	//raceId, String stageName, String description, double length, LocalDateTime startTime, StageType type
+
+	String stageName;
+	String description;
+	double length;
+	LocalDateTime startTime;
+	StageType type;
 
     // @Override
 	// public double getStageLength(int stageId) throws IDNotRecognisedException {

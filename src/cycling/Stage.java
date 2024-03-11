@@ -4,13 +4,42 @@ public class Stage {
 
 	//raceId, String stageName, String description, double length, LocalDateTime startTime, StageType type
 
-	String stageName;
-	String description;
-	double length;
-	LocalDateTime startTime;
-	StageType type;
+	private String stageName;
+	private String description;
+	private double length;
+	private LocalDateTime startTime;
+	private StageType type;
 
-    // @Override
+	public Stage(String stageName, String description, double length, LocalDateTime startTime, StageType type){
+		this.stageName = stageName;
+		this.description = description;
+		this.length = length;
+		this.startTime = startTime;
+		this.type = type;
+	}
+
+	public String getstageName() {
+		return stageName;
+	}
+
+	public String getDesciption(){
+		return description;
+	}
+
+	public double getlength(){
+		return length;
+	}  
+
+	public LocalDateTime getstartTime(){
+		return startTime;
+	}
+
+	public StageType gettype(){
+		return type;
+	}
+
+
+	  // @Override
 	// public double getStageLength(int stageId) throws IDNotRecognisedException {
 	// 	// TODO Auto-generated method stub
 	// 	return 0;

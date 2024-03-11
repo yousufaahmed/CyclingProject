@@ -137,7 +137,7 @@ public interface MiniCyclingPortal extends Serializable {
 	 * <p>
 	 * The state of this MiniCyclingPortal must be unchanged if any
 	 * exceptions are thrown.
-	 * 
+	 *
 	 * @param stageId The ID of the stage being removed.
 	 * @throws IDNotRecognisedException If the ID does not match to any stage in the
 	 *                                  system.

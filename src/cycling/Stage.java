@@ -2,19 +2,19 @@ package cycling;
 import java.time.LocalDateTime;
 public class Stage {
 
-	//raceId, String stageName, String description, double length, LocalDateTime startTime, StageType type
+	private String stageName;
+	private String description;
+	private double length;
+	private LocalDateTime startTime;
+	private StageType type;
 
-	String stageName;
-	String description;
-	double length;
-	LocalDateTime startTime;
-	StageType type;
+	public double getStageLength(int stageId){
+		return length;
+	}
 
-    // @Override
-	// public double getStageLength(int stageId) throws IDNotRecognisedException {
-	// 	// TODO Auto-generated method stub
-	// 	return 0;
-	// }
+	public Stage(String stageName, String description, double length, LocalDateTime startTime, StageType type){
+		this.description = description;
+	}
 
 	// @Override
 	// public void removeStageById(int stageId) throws IDNotRecognisedException {

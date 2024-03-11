@@ -83,8 +83,12 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	@Override
 	public void removeRaceById(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-
+		if (races.get(raceId) != null){
+            races.remove(raceId);
+        }
+        else{
+            throw new IDNotRecognisedException("raceId doesnt exist");
+        }
 	}
 
 	@Override

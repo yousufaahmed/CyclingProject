@@ -47,7 +47,6 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		return false;
 	}
 
-
 ///////////////////////////////////////////////////////////////////
     public BadMiniCyclingPortalImpl(){
 		this.raceIds = new ArrayList<>();
@@ -59,8 +58,6 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		int[] raceIdsArray = raceIds.stream().mapToInt(Integer::intValue).toArray();
 		return raceIdsArray;
 	}
-
-
 
 	@Override
 	public int createRace(String name, String description) throws IllegalNameException, InvalidNameException {

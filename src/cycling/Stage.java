@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 // import javax.swing.plaf.nimbus.State;
 public class Stage {
 
-	//raceId, String stageName, String description, double length, LocalDateTime startTime, StageType type
-
 	private String stageName;
 	private String description;
 	private double length;
@@ -53,7 +51,7 @@ public class Stage {
 		return state;
 	}
 
-	  // @Override
+    // @Override
 	// public double getStageLength(int stageId) throws IDNotRecognisedException {
 	// 	// TODO Auto-generated method stub
 	// 	return 0;

@@ -21,10 +21,14 @@ import java.util.Map;
 public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	public List<Integer> raceIds = new ArrayList<>();
 	public List<Integer> stageIds = new ArrayList<>();
-	public Map<Integer, Race> races = new HashMap<>();
-	public Map<Integer, Stage> stages = new HashMap<>();
-	public Map<Integer, int[]> stagesrace = new HashMap<>();
+	public Map<Integer, Race> races = new HashMap<>(); // raceid - race
+	public Map<Integer, Stage> stages = new HashMap<>(); // stageid - stage
+	public Map<Integer, int[]> stagesrace = new HashMap<>(); // raceid - [stageids]
 
+	public List<Integer> cpIds = new ArrayList<>(); // checkpointids
+	public Map<Integer, ClimbCheckpoints> climbcheckpoints = new HashMap<>(); // checkpointid - checkpoint
+	public Map<Integer, ISprintCheckpoints> isprintcheckpoints = new HashMap<>(); // isprintid - checkpoint
+	public Map<Integer, int[]> checkpointsstages = new HashMap<>(); // stageid - [checkpointids]
 
 /////////////////////////////////////////////////////
 	
@@ -181,7 +185,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	public double getStageLength(int stageId) throws IDNotRecognisedException {
 		
 		if (!stages.containsKey(stageId)) {
-			throw new IDNotRecognisedException("Race ID not recognized: " + stageId);
+			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
 		}
 
 		Stage stage = stages.get(stageId);
@@ -191,23 +195,123 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	@Override
 	public void removeStageById(int stageId) throws IDNotRecognisedException {
-		
+		if (!stages.containsKey(stageId)) {
+			throw new IDNotRecognisedException("Stage with ID " + stageId + " not found.");
+		}
+	
+		stages.remove(stageId);
 
+		for (Map.Entry<Integer, int[]> entry : stagesrace.entrySet()) {
+            int[] array = entry.getValue();
+            for (int i = 0; i < array.length; i++) {
+                if (array[i] == stageId) {
+                    // Create a new array without the targetValue
+                    int[] newArray = new int[array.length - 1];
+                    System.arraycopy(array, 0, newArray, 0, i);
+                    System.arraycopy(array, i + 1, newArray, i, array.length - i - 1);
+
+                    // Update the array associated with the key
+                    stagesrace.put(entry.getKey(), newArray);
+
+                    // Exit the inner loop after deletion
+                    break;
+                }
+            }
+        }
 	}
 
 	@Override
 	public int addCategorizedClimbToStage(int stageId, Double location, CheckpointType type, Double averageGradient,
 			Double length) throws IDNotRecognisedException, InvalidLocationException, InvalidStageStateException,
 			InvalidStageTypeException {
-		// TODO Auto-generated method stub
-		return 0;
+
+		if (!stages.containsKey(stageId)) {
+			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+		}
+
+		Stage stage = stages.get(stageId);
+
+		// Check if the stage is in a valid state
+		if (stage.getState() == StageState.WAITING_FOR_RESULTS) {
+			throw new InvalidStageStateException("Stage is in 'waiting for results' state and cannot be modified.");
+		}            
+
+		// Check if the stage type allows climb checkpoints
+		if (stage.gettype() == StageType.TT) {
+			throw new InvalidStageTypeException("Time-trial stages cannot contain any checkpoint.");
+		}
+
+		// Check if the location is within the bounds of the stage length
+		if (location < 0 || location > stage.getlength()) {
+			throw new InvalidLocationException("Location is out of bounds of the stage length.");
+		}
+
+		// Create a new climb checkpoint
+		int checkpointId = cpIds.size() + 1;
+		cpIds.add(checkpointId);
+		ClimbCheckpoints checkpoint = new ClimbCheckpoints(location, type, averageGradient, length);
+		climbcheckpoints.put(checkpointId, checkpoint);
+
+		// Add the checkpoint to the stage
+		int[] stageCheckpoints = getStageCheckpoints(stageId);
+		if (stageCheckpoints.length != 0){
+			int[] Originalarray = checkpointsstages.get(stageId);
+			int[] newArray = Arrays.copyOf(Originalarray,Originalarray.length + 1);
+			newArray[newArray.length - 1] = stageId;
+			checkpointsstages.replace(stageId, newArray);   
+		}else{
+			int[] newArray = {stageId};  
+			checkpointsstages.put(stageId, newArray);
+		}
+
+		// Return the ID of the created checkpoint
+		return checkpointId;
 	}
 
 	@Override
 	public int addIntermediateSprintToStage(int stageId, double location) throws IDNotRecognisedException,
 			InvalidLocationException, InvalidStageStateException, InvalidStageTypeException {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		if (!stages.containsKey(stageId)) {
+			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+		}
+
+		Stage stage = stages.get(stageId);
+
+		// Check if the stage is in a valid state
+		if (stage.getState() == StageState.WAITING_FOR_RESULTS) {
+			throw new InvalidStageStateException("Stage is in 'waiting for results' state and cannot be modified.");
+		}            
+
+		// Check if the stage type allows climb checkpoints
+		if (stage.gettype() == StageType.TT) {
+			throw new InvalidStageTypeException("Time-trial stages cannot contain any checkpoint.");
+		}
+
+		// Check if the location is within the bounds of the stage length
+		if (location < 0 || location > stage.getlength()) {
+			throw new InvalidLocationException("Location is out of bounds of the stage length.");
+		}
+
+		// Create a new climb checkpoint
+		int checkpointId = cpIds.size() + 1;
+		cpIds.add(checkpointId);
+		ISprintCheckpoints checkpoint = new ISprintCheckpoints(location);
+		isprintcheckpoints.put(checkpointId, checkpoint);
+
+		// Add the checkpoint to the stage
+		int[] stageCheckpoints = getStageCheckpoints(stageId);
+		if (stageCheckpoints.length != 0){
+			int[] Originalarray = checkpointsstages.get(stageId);
+			int[] newArray = Arrays.copyOf(Originalarray,Originalarray.length + 1);
+			newArray[newArray.length - 1] = stageId;
+			checkpointsstages.replace(stageId, newArray);   
+		}else{
+			int[] newArray = {stageId};
+			checkpointsstages.put(stageId, newArray);
+		}
+
+		return checkpointId;
 	}
 
 	@Override
@@ -224,8 +328,17 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	@Override
 	public int[] getStageCheckpoints(int stageId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if (checkpointsstages.isEmpty()){
+			return new int[0];
+		}
+		else if (!checkpointsstages.containsKey(stageId)) {
+			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+		}
+		
+		int[] checkpointsArr = checkpointsstages.get(stageId);
+
+		return checkpointsArr;
 	}
 
 	@Override

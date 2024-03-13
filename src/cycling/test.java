@@ -3,7 +3,8 @@ package cycling;
 import java.time.LocalDateTime;
 
 public class test {
-    public static void main(String[] args) throws IllegalNameException, InvalidNameException, IDNotRecognisedException, InvalidLengthException {
+    public static void main(String[] args) throws IllegalNameException, InvalidNameException, IDNotRecognisedException, InvalidLengthException,InvalidLocationException, InvalidStageStateException,
+    InvalidStageTypeException {
         MiniCyclingPortal miniCyclingPortal = new BadMiniCyclingPortalImpl();
         miniCyclingPortal.createRace("TourFR", "The famous cycling race");
         miniCyclingPortal.createRace("TourEU", "The famous cycling race in EU");
@@ -32,6 +33,11 @@ public class test {
 
         int nstage = miniCyclingPortal.getNumberOfStages(1);
         System.out.println(nstage);
+        miniCyclingPortal.addStageToRace(1,"Theboulder3","An epic climb against boulders 3",7.5,startTime,StageType.HIGH_MOUNTAIN);
+        //miniCyclingPortal.removeStageById(1);
+        //int nostage = miniCyclingPortal.getNumberOfStages(1);
+        //System.out.println(nostage);
+        miniCyclingPortal.addIntermediateSprintToStage(3, 2.0);
     
     }
 }

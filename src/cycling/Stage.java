@@ -1,5 +1,7 @@
 package cycling;
 import java.time.LocalDateTime;
+
+// import javax.swing.plaf.nimbus.State;
 public class Stage {
 
 	//raceId, String stageName, String description, double length, LocalDateTime startTime, StageType type
@@ -9,13 +11,22 @@ public class Stage {
 	private double length;
 	private LocalDateTime startTime;
 	private StageType type;
+	StageState state;
 
-	public Stage(String stageName, String description, double length, LocalDateTime startTime, StageType type){
+	public Stage(String stageName, String description, double length, LocalDateTime startTime, StageType type, StageState ... state){
 		this.stageName = stageName;
 		this.description = description;
 		this.length = length;
 		this.startTime = startTime;
 		this.type = type;
+		this.state = StageState.READY;
+		
+		
+		if (stageName != null && description != null && startTime != null && stageName != null) { // add the length with the tolerance
+            this.state = StageState.READY;
+        } else {
+            this.state = StageState.WAITING_FOR_RESULTS;
+        } 
 	}
 
 	public String getstageName() {
@@ -38,6 +49,9 @@ public class Stage {
 		return type;
 	}
 
+	public StageState getState(){
+		return state;
+	}
 
 	  // @Override
 	// public double getStageLength(int stageId) throws IDNotRecognisedException {

@@ -1,12 +1,14 @@
 package cycling;
 public class Team {
-    private int[] riders;
     private String name;
+    private String description;
     private int id;
     private int score;
+    private int[] riders;
+
     public Team(){}
 
-    public Team(String name){this.name = name;}
+    public Team(String name, String description){this.name = name; this.description = description;}
     public Team(String name, int id){this.name = name; this.id = id;}
     public Team(String name, int id, int[] riders){
         this.name = name;
@@ -17,6 +19,10 @@ public class Team {
     public int[] getRiders() {
         return riders;
     }
+
+	public String getDescription(){
+		return description;
+	}
 
     public void setRiders(int[] riders) {
         this.riders = riders;

@@ -67,6 +67,7 @@ public interface MiniCyclingPortal extends Serializable {
 	 */
 	void removeRaceById(int raceId) throws IDNotRecognisedException;
 
+
 	/**
 	 * The method queries the number of stages created for a race.
 	 * <p>

@@ -1,7 +1,13 @@
 package cycling;
 
+// TO DO:
+
+// CREATE A CLASSES UML DIAGRAM
+// ADD SOME SORT OF INHERITANCE
+
 import java.io.IOException;
 import java.lang.reflect.Array;
+import javax.swing.text.TextAction;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -19,19 +25,29 @@ import java.util.Map;
  *
  */
 public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
-	public List<Integer> raceIds = new ArrayList<>();
-	public List<Integer> stageIds = new ArrayList<>();
+	private static int CPIDCounter = 0;
+	private static int raceIDCounter = 0;
+	private static int stageIDCounter = 0;
+	private static int teamIDCounter = 0;
+	private static int riderIDCounter = 0;
+	public List<Integer> raceIDs = new ArrayList<>();
+	public List<Integer> stageIDs = new ArrayList<>();
 	public Map<Integer, Race> races = new HashMap<>(); // raceid - race
 	public Map<Integer, Stage> stages = new HashMap<>(); // stageid - stage
-	public Map<Integer, int[]> stagesrace = new HashMap<>(); // raceid - [stageids]
+	public Map<Integer, int[]> stagesRace = new HashMap<>(); // raceid - [stageids]
 
-	public List<Integer> cpIds = new ArrayList<>(); // checkpointids
-	public Map<Integer, ClimbCheckpoints> climbcheckpoints = new HashMap<>(); // checkpointid - checkpoint
-	public Map<Integer, ISprintCheckpoints> isprintcheckpoints = new HashMap<>(); // isprintid - checkpoint
-	public Map<Integer, int[]> checkpointsstages = new HashMap<>(); // stageid - [checkpointids]
+	public List<Integer> teamIDs = new ArrayList<>();
+	public Map<Integer, Team> teams = new HashMap<>(); // stageid - stage
+	public Map<Integer, int[]> teamRiders = new HashMap<>(); // team - [riderids]
+	public List<Integer> riderIDs = new ArrayList<>();
+	public Map<Integer, Rider> riders = new HashMap<>(); // riderid - rider
+
+	public List<Integer> cpIDs = new ArrayList<>(); // checkpointids
+	public Map<Integer, ClimbCheckpoints> climbCheckpoints = new HashMap<>(); // checkpointid - climbcheckpoint
+	public Map<Integer, ISprintCheckpoints> ISprintCheckpoints = new HashMap<>(); // checkpointid - isprintcheckpoint
+	public Map<Integer, int[]> checkpointsStages = new HashMap<>(); // stageid - [checkpointids]
 
 /////////////////////////////////////////////////////
-	
 
 	private boolean raceNameExists(String name) {
 		for (Race existingRace : races.values()) {
@@ -51,16 +67,37 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		return false;
 	}
 
+	private boolean teamNameExists(String name) {
+		for (Stage existingStage : stages.values()) {
+			if (existingStage.getstageName() == name) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 ///////////////////////////////////////////////////////////////////
     public BadMiniCyclingPortalImpl(){
-		this.raceIds = new ArrayList<>();
-		this.races = new HashMap<>();
+		this.raceIDs = new ArrayList<>();
+        this.stageIDs = new ArrayList<>();
+        this.races = new HashMap<>();
+        this.stages = new HashMap<>();
+        this.stagesRace = new HashMap<>();
+        this.cpIDs = new ArrayList<>();
+        this.climbCheckpoints = new HashMap<>();
+        this.ISprintCheckpoints = new HashMap<>();
+        this.checkpointsStages = new HashMap<>();
+
+        // You might want to initialize the counters based on existing data if applicable
+        CPIDCounter = 0;// logic to determine the starting value for CPIDCounter
+        raceIDCounter = 0;// logic to determine the starting value for raceIDCounter
+        stageIDCounter = 0;
 	}
 
 	@Override
 	public int[] getRaceIds() {
-		int[] raceIdsArray = raceIds.stream().mapToInt(Integer::intValue).toArray();
-		return raceIdsArray;
+		int[] raceIDsArray = raceIDs.stream().mapToInt(Integer::intValue).toArray();
+		return raceIDsArray;
 	}
 
 	@Override
@@ -75,8 +112,8 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
             throw new IllegalNameException("name already exists");
         }
         // create raceID and add to list
-		int raceId = raceIds.size() + 1;
-        raceIds.add(raceId);
+		int raceId = ++raceIDCounter;
+        raceIDs.add(raceId);
 		// Create a Race object and associate it with the raceId
 		Race race = new Race(name, description);
 		races.put(raceId, race);
@@ -99,6 +136,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 
 	@Override
+	// NEED TO UPDATE IT LATER
 	public void removeRaceById(int raceId) throws IDNotRecognisedException {
 		if (!races.containsKey(raceId)) {
 			throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
@@ -110,14 +148,14 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	@Override
 	public int getNumberOfStages(int raceId) throws IDNotRecognisedException {
-		if (stagesrace.isEmpty()){
+		if (stagesRace.isEmpty()){
 			return 0;
 		}
-		else if(!stagesrace.containsKey(raceId)) {
+		else if(!stagesRace.containsKey(raceId)) {
 			throw new IDNotRecognisedException("Stage with ID " + raceId + " not found.");
 		}
 		
-		int[] stageArray = stagesrace.get(raceId);
+		int[] stageArray = stagesRace.get(raceId);
 		int nStages = stageArray.length;
 		return nStages;
 	}
@@ -146,20 +184,20 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 				}
 
 				// Increment the nextStageId for the next stage
-				int stageId = stageIds.size() + 1;
-                stageIds.add(stageId);
+				int stageId = ++stageIDCounter;
+                stageIDs.add(stageId);
 				// Map the stage to the race
 				Stage stage = new Stage(stageName, description, length, startTime, type);
 				stages.put(stageId, stage);
 				
 				if (getNumberOfStages(raceId) != 0){
-					int[] Originalarray = stagesrace.get(raceId);
+					int[] Originalarray = stagesRace.get(raceId);
 					int[] newArray = Arrays.copyOf(Originalarray,Originalarray.length + 1);
 					newArray[newArray.length - 1] = stageId;
-					stagesrace.replace(raceId, newArray);   
+					stagesRace.replace(raceId, newArray);   
 				}else{
 					int[] newArray = {stageId};
-					stagesrace.put(raceId, newArray);
+					stagesRace.put(raceId, newArray);
 				}
 
 				// Return the unique ID of the stage
@@ -169,11 +207,11 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	@Override
 	public int[] getRaceStages(int raceId) throws IDNotRecognisedException {
 
-		if (!stagesrace.containsKey(raceId)) {
+		if (!stagesRace.containsKey(raceId)) {
 			throw new IDNotRecognisedException("Race ID not recognized: " + raceId);
 		}
 		
-		int[] stagesArr = stagesrace.get(raceId);
+		int[] stagesArr = stagesRace.get(raceId);
 
 		return stagesArr;
 	}
@@ -198,23 +236,35 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	
 		stages.remove(stageId);
 
-		for (Map.Entry<Integer, int[]> entry : stagesrace.entrySet()) {
-            int[] array = entry.getValue();
-            for (int i = 0; i < array.length; i++) {
-                if (array[i] == stageId) {
-                    // Create a new array without the targetValue
-                    int[] newArray = new int[array.length - 1];
-                    System.arraycopy(array, 0, newArray, 0, i);
-                    System.arraycopy(array, i + 1, newArray, i, array.length - i - 1);
-
-                    // Update the array associated with the key
-                    stagesrace.put(entry.getKey(), newArray);
-
-                    // Exit the inner loop after deletion
-                    break;
-                }
-            }
-        }
+		for (Map.Entry<Integer, int[]> entry : stagesRace.entrySet()) {
+			int[] array = entry.getValue();
+			int indexToRemove = -1;
+		
+			// Find the index of the target value in the array
+			for (int i = 0; i < array.length; i++) {
+				if (array[i] == stageId) {
+					indexToRemove = i;
+					break;
+				}
+			}
+		
+			if (indexToRemove != -1) {
+				// Create a new array with size - 1
+				int[] newArray = new int[array.length - 1];
+		
+				// Copy the elements before the target value
+				System.arraycopy(array, 0, newArray, 0, indexToRemove);
+		
+				// Copy the elements after the target value
+				System.arraycopy(array, indexToRemove + 1, newArray, indexToRemove, array.length - indexToRemove - 1);
+		
+				// Update the array associated with the key
+				stagesRace.put(entry.getKey(), newArray);
+		
+				// Exit the loop after deletion
+				break;
+			}
+		}
 	}
 
 	@Override
@@ -229,7 +279,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		Stage stage = stages.get(stageId);
 
 		// Check if the stage is in a valid state
-		if (stage.getState() == StageState.WAITING_FOR_RESULTS) {
+		if (stage.getState() == StageState.READY) {
 			throw new InvalidStageStateException("Stage is in 'waiting for results' state and cannot be modified.");
 		}            
 
@@ -244,21 +294,21 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		}
 
 		// Create a new climb checkpoint
-		int checkpointId = cpIds.size() + 1;
-		cpIds.add(checkpointId);
+		int checkpointId = ++CPIDCounter;
+		cpIDs.add(checkpointId);
 		ClimbCheckpoints checkpoint = new ClimbCheckpoints(location, type, averageGradient, length);
-		climbcheckpoints.put(checkpointId, checkpoint);
+		climbCheckpoints.put(checkpointId, checkpoint);
 
 		// Add the checkpoint to the stage
 		int[] stageCheckpoints = getStageCheckpoints(stageId);
 		if (stageCheckpoints.length != 0){
-			int[] Originalarray = checkpointsstages.get(stageId);
+			int[] Originalarray = checkpointsStages.get(stageId);
 			int[] newArray = Arrays.copyOf(Originalarray,Originalarray.length + 1);
 			newArray[newArray.length - 1] = stageId;
-			checkpointsstages.replace(stageId, newArray);   
+			checkpointsStages.replace(stageId, newArray);   
 		}else{
 			int[] newArray = {stageId};  
-			checkpointsstages.put(stageId, newArray);
+			checkpointsStages.put(stageId, newArray);
 		}
 
 		// Return the ID of the created checkpoint
@@ -276,7 +326,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		Stage stage = stages.get(stageId);
 
 		// Check if the stage is in a valid state
-		if (stage.getState() == StageState.WAITING_FOR_RESULTS) {
+		if (stage.getState() == StageState.READY) {
 			throw new InvalidStageStateException("Stage is in 'waiting for results' state and cannot be modified.");
 		}            
 
@@ -291,87 +341,214 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		}
 
 		// Create a new climb checkpoint
-		int checkpointId = cpIds.size() + 1;
-		cpIds.add(checkpointId);
+		int checkpointId = ++CPIDCounter;
+		cpIDs.add(checkpointId);
 		ISprintCheckpoints checkpoint = new ISprintCheckpoints(location);
-		isprintcheckpoints.put(checkpointId, checkpoint);
+		ISprintCheckpoints.put(checkpointId, checkpoint);
 
 		// Add the checkpoint to the stage
 		int[] stageCheckpoints = getStageCheckpoints(stageId);
 		if (stageCheckpoints.length != 0){
-			int[] Originalarray = checkpointsstages.get(stageId);
+			int[] Originalarray = checkpointsStages.get(stageId);
 			int[] newArray = Arrays.copyOf(Originalarray,Originalarray.length + 1);
 			newArray[newArray.length - 1] = stageId;
-			checkpointsstages.replace(stageId, newArray);   
+			checkpointsStages.replace(stageId, newArray);   
 		}else{
 			int[] newArray = {stageId};
-			checkpointsstages.put(stageId, newArray);
+			checkpointsStages.put(stageId, newArray);
 		}
 
 		return checkpointId;
 	}
 
 	@Override
+	// GETTING A RANDOM LOGIC ERROR, CHECK LATER TO FIX
 	public void removeCheckpoint(int checkpointId) throws IDNotRecognisedException, InvalidStageStateException {
-		// TODO Auto-generated method stub
+		if (!ISprintCheckpoints.containsKey(checkpointId) && !climbCheckpoints.containsKey(checkpointId)) {
+			throw new IDNotRecognisedException("Checkpoint with ID " + checkpointId + " not found.");
+		}
 
+	    cpIDs.remove(checkpointId);
+		climbCheckpoints.remove(checkpointId);
+		ISprintCheckpoints.remove(checkpointId);
+
+		for (Map.Entry<Integer, int[]> entry : checkpointsStages.entrySet()) {
+			int[] array = entry.getValue();
+			int indexToRemove = -1;
+			for (int i = 0; i < array.length; i++) {
+				if (array[i] == checkpointId) {
+					indexToRemove = i;
+					break;
+				}
+			}
+	
+			if (indexToRemove != -1) {
+				// Create a new array with size - 1
+				int[] newArray = new int[array.length - 1];
+	
+				// Copy the elements before the target value
+				System.arraycopy(array, 0, newArray, 0, indexToRemove);
+	
+				// Copy the elements after the target value
+				System.arraycopy(array, indexToRemove + 1, newArray, indexToRemove, array.length - indexToRemove - 1);
+	
+				// Update the array associated with the key
+				checkpointsStages.put(entry.getKey(), newArray);
+	
+				// Exit the loop after deletion
+				break;
+			}
+		}
 	}
+
 
 	@Override
 	public void concludeStagePreparation(int stageId) throws IDNotRecognisedException, InvalidStageStateException {
-		// TODO Auto-generated method stub
-
+		// Check if the stage ID is recognized
+		if (!stages.containsKey(stageId)) {
+			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+		}
+	
+		// Retrieve the stage object
+		Stage stage = stages.get(stageId);
+	
+		// Check if the stage is not already in "waiting for results" state
+		if (stage.getState() == StageState.WAITING_FOR_RESULTS) {
+			throw new InvalidStageStateException("Stage is already in 'waiting for results' state.");
+		}
+	
+		// Update the state of the stage to "waiting for results"
+		stage.setState();
 	}
 
 	@Override
 	public int[] getStageCheckpoints(int stageId) throws IDNotRecognisedException {
 		
-		if (checkpointsstages.isEmpty()){
+		if (checkpointsStages.isEmpty()){
 			return new int[0];
 		}
-		else if (!checkpointsstages.containsKey(stageId)) {
-			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+		else if (!checkpointsStages.containsKey(stageId)) {
+			throw new IDNotRecognisedException("Stage ID was not recognized: " + stageId);
 		}
 		
-		int[] checkpointsArr = checkpointsstages.get(stageId);
+		int[] checkpointsArr = checkpointsStages.get(stageId);
 
 		return checkpointsArr;
 	}
 
 	@Override
 	public int createTeam(String name, String description) throws IllegalNameException, InvalidNameException {
-		// TODO Auto-generated method stub
-		return 0;
+		if (name == null || name.trim().isEmpty() || name.length() > 30 || name.contains(" ")) {
+            throw new InvalidNameException("name not valid");
+        }
+
+        // Check if the name already exists
+        if (teamNameExists(name)) {
+            throw new IllegalNameException("name already exists");
+        }
+
+        // create raceID and add to list
+		int teamId = ++teamIDCounter;
+        teamIDs.add(teamId);
+
+		// Create a Race object and associate it with the raceId
+		Team team = new Team(name, description);
+		teams.put(teamId, team);
+
+        return teamId;
 	}
 
 	@Override
 	public void removeTeam(int teamId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-
+		
+		if (!teams.containsKey(teamId)) {
+			throw new IDNotRecognisedException("Team with ID " + teamId + " not found.");
+		}
+	    teamIDs.remove(teamId);
+		teams.remove(teamId);
 	}
 
 	@Override
 	public int[] getTeams() {
-		// TODO Auto-generated method stub
-		return null;
+		int[] teamIDsArray = teamIDs.stream().mapToInt(Integer::intValue).toArray();
+		return teamIDsArray;
 	}
 
 	@Override
 	public int[] getTeamRiders(int teamId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		if (teamRiders.isEmpty()){
+			return new int[0];
+		}
+		else if (!teamRiders.containsKey(teamId)) {
+			throw new IDNotRecognisedException("Team ID was not recognized: " + teamId);
+		}
+		
+		int[] ridersArr = teamRiders.get(teamId);
 
+		return ridersArr;
+	}
+	
 	@Override
 	public int createRider(int teamID, String name, int yearOfBirth)
 			throws IDNotRecognisedException, IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		if (!teams.containsKey(teamID)) {
+			throw new IDNotRecognisedException("Team ID not recognized: " + teamID);
+		}
+
+		if (name == null || name == "" || yearOfBirth < 1900) {
+			throw new IllegalArgumentException("Invalid name or invalid year of birth, please try again.");
+		}
+
+		// create raceID and add to list
+		int riderId = ++riderIDCounter;
+		riderIDs.add(riderId);
+
+		// Create a Race object and associate it with the raceId
+		Rider rider = new Rider(name, yearOfBirth);
+		riders.put(riderId, rider);
+
+		return riderId;   
 	}
 
 	@Override
 	public void removeRider(int riderId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
+		
+		if (!riders.containsKey(riderId)) {
+			throw new IDNotRecognisedException("Rider with ID " + riderId + " not found.");
+		}
+	
+		riders.remove(riderId);
+
+		for (Map.Entry<Integer, int[]> entry : teamRiders.entrySet()) {
+			int[] array = entry.getValue();
+			int indexToRemove = -1;
+		
+			// Find the index of the target value in the array
+			for (int i = 0; i < array.length; i++) {
+				if (array[i] == riderId) {
+					indexToRemove = i;
+					break;
+				}
+			}
+		
+			if (indexToRemove != -1) {
+				// Create a new array with size - 1
+				int[] newArray = new int[array.length - 1];
+		
+				// Copy the elements before the target value
+				System.arraycopy(array, 0, newArray, 0, indexToRemove);
+		
+				// Copy the elements after the target value
+				System.arraycopy(array, indexToRemove + 1, newArray, indexToRemove, array.length - indexToRemove - 1);
+		
+				// Update the array associated with the key
+				teamRiders.put(entry.getKey(), newArray);
+		
+				// Exit the loop after deletion
+				break;
+			}
+		}
 
 	}
 
@@ -379,7 +556,8 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	public void registerRiderResultsInStage(int stageId, int riderId, LocalTime... checkpoints)
 			throws IDNotRecognisedException, DuplicatedResultException, InvalidCheckpointTimesException,
 			InvalidStageStateException {
-		// TODO Auto-generated method stub
+		
+		
 
 	}
 

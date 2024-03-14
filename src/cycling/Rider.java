@@ -11,9 +11,10 @@ public class Rider {
 
     // public Rider(String name, int id){this.name = name; this.id = id;}
 
-    public Rider(String name){
+    public Rider(String name, int yearOfBirth){
         this.name = name;
         this.id = ++RiderIDCounter;
+        this.yearOfBirth = yearOfBirth;
     }
 
     public String getName(){

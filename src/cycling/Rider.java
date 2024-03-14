@@ -1,5 +1,5 @@
 package cycling;
-import java.util.ArrayList;
+
 public class Rider {
     private String name;
     private int id;

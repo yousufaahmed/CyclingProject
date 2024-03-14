@@ -18,20 +18,14 @@ public class Stage {
 		this.startTime = startTime;
 		this.type = type;
 		this.state = StageState.READY;
-		
-		
-		if (stageName != null && description != null && startTime != null && stageName != null) { // add the length with the tolerance
-            this.state = StageState.READY;
-        } else {
-            this.state = StageState.WAITING_FOR_RESULTS;
-        } 
 	}
+		
 
 	public String getstageName() {
 		return stageName;
 	}
 
-	public String getDesciption(){
+	public String getDescription(){
 		return description;
 	}
 
@@ -50,6 +44,10 @@ public class Stage {
 	public StageState getState(){
 		return state;
 	}
+
+	public void setState() {
+        this.state = StageState.WAITING_FOR_RESULTS;
+    }
 
     // @Override
 	// public double getStageLength(int stageId) throws IDNotRecognisedException {

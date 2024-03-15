@@ -110,8 +110,6 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		return raceIDsArray;
 	}
 
-
-
 	@Override
 	public int createRace(String name, String description) throws IllegalNameException, InvalidNameException {
 		// Check for invalid name

@@ -1,15 +1,10 @@
 package cycling;
+// CHECK IF THIS WORKS
 
-public class ISprintCheckpoints {
-    
-    private Double location;
+public class ISprintCheckpoints extends Checkpoints{
 
     public ISprintCheckpoints(Double location){
-		this.location = location;
-	}
-
-    public Double getLocation() {
-		return location;
+		super(location);
 	}
 
 }

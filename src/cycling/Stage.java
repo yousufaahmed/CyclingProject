@@ -1,5 +1,10 @@
 package cycling;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // import javax.swing.plaf.nimbus.State;
 public class Stage {
@@ -9,6 +14,7 @@ public class Stage {
 	private double length;
 	private LocalDateTime startTime;
 	private StageType type;
+	private Map<Integer, List<LocalTime>> riderResultsMap;
 	StageState state;
 
 	public Stage(String stageName, String description, double length, LocalDateTime startTime, StageType type, StageState ... state){
@@ -18,6 +24,7 @@ public class Stage {
 		this.startTime = startTime;
 		this.type = type;
 		this.state = StageState.READY;
+		this.riderResultsMap = new HashMap<>();
 	}
 		
 
@@ -48,6 +55,29 @@ public class Stage {
 	public void setState() {
         this.state = StageState.WAITING_FOR_RESULTS;
     }
+
+	public void recordRiderResults(int riderId, LocalTime... checkpointTimes) {
+        // Record the rider's checkpoint times
+        List<LocalTime> times = List.of(checkpointTimes);
+        riderResultsMap.put(riderId, times);
+    }
+
+	public boolean hasResultForRider(int riderId) {
+        return riderResultsMap.containsKey(riderId);
+    }
+
+	public LocalTime[] getRiderResult(int riderId) {
+		List<LocalTime> results = riderResultsMap.getOrDefault(riderId, List.of());
+        return results.toArray(new LocalTime[0]);
+        // return riderResultsMap.getOrDefault(riderId, List.of());
+    }
+
+	public void removeRiderResultsInStage(int riderId) {
+        
+        riderResultsMap.remove(riderId);
+    }
+	
+
 
     // @Override
 	// public double getStageLength(int stageId) throws IDNotRecognisedException {

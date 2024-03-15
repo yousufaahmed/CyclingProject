@@ -355,7 +355,7 @@ public interface MiniCyclingPortal extends Serializable {
 	 * @param riderId The ID of the rider.
 	 * @return The array of times at which the rider reached each of the checkpoints
 	 *         of the stage and the total elapsed time. The elapsed time is the
-	 *         difference between the finish time and the start time. Return an
+	 *         difference between the finish ti     me and the start time. Return an
 	 *         empty array if there is no result registered for the rider in the
 	 *         stage. Assume the total elapsed time of a stage never exceeds 24h
 	 *         and, therefore, can be represented by a LocalTime variable. There is

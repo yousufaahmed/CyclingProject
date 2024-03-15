@@ -4,6 +4,8 @@ package cycling;
 
 // CREATE A CLASSES UML DIAGRAM
 // ADD SOME SORT OF INHERITANCE
+// ADD EXCEPTION HANDLING
+// ADD CLASS DOCUMENTATION USING /** */
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -15,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.Duration;
 
 /**
  * BadMiniCyclingPortal is a minimally compiling, but non-functioning implementor
@@ -25,11 +28,13 @@ import java.util.Map;
  *
  */
 public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
+	// not the most efficient...
 	private static int CPIDCounter = 0;
 	private static int raceIDCounter = 0;
 	private static int stageIDCounter = 0;
 	private static int teamIDCounter = 0;
 	private static int riderIDCounter = 0;
+
 	public List<Integer> raceIDs = new ArrayList<>();
 	public List<Integer> stageIDs = new ArrayList<>();
 	public Map<Integer, Race> races = new HashMap<>(); // raceid - race
@@ -75,6 +80,11 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		}
 		return false;
 	}
+
+	private boolean isCloseTogether(LocalTime time1, LocalTime time2) {
+        // Assuming "close together" means less than one second difference
+        return Math.abs(time1.toNanoOfDay() - time2.toNanoOfDay()) < 1_000_000_000L;
+    }
 
 ///////////////////////////////////////////////////////////////////
     public BadMiniCyclingPortalImpl(){
@@ -166,44 +176,44 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	public int addStageToRace(int raceId, String stageName, String description, double length, LocalDateTime startTime,
 			StageType type)
 			throws IDNotRecognisedException, IllegalNameException, InvalidNameException, InvalidLengthException {
-				if (!races.containsKey(raceId)) {
-					throw new IDNotRecognisedException("Race ID not recognized: " + raceId);
-				}
-		
-				// Check for invalid name
-				if (stageName == null || stageName.trim().isEmpty() || stageName.length() > 30 || stageName.contains(" ")) {
-					throw new InvalidNameException("Invalid stage name: " + stageName);
-				}
-		
-				// Check if the name already exists
-				if (stageNameExists(stageName)) {
-					throw new IllegalNameException("Stage name already exists: " + stageName);
-				}
-		
-				// Check for invalid length
-				if (length < 5.0) {
-					throw new InvalidLengthException("Invalid stage length: " + length);
-				}
+		if (!races.containsKey(raceId)) {
+			throw new IDNotRecognisedException("Race ID not recognized: " + raceId);
+		}
 
-				// Increment the nextStageId for the next stage
-				int stageId = ++stageIDCounter;
-                stageIDs.add(stageId);
-				// Map the stage to the race
-				Stage stage = new Stage(stageName, description, length, startTime, type);
-				stages.put(stageId, stage);
-				
-				if (getNumberOfStages(raceId) != 0){
-					int[] Originalarray = stagesRace.get(raceId);
-					int[] newArray = Arrays.copyOf(Originalarray,Originalarray.length + 1);
-					newArray[newArray.length - 1] = stageId;
-					stagesRace.replace(raceId, newArray);   
-				}else{
-					int[] newArray = {stageId};
-					stagesRace.put(raceId, newArray);
-				}
+		// Check for invalid name
+		if (stageName == null || stageName.trim().isEmpty() || stageName.length() > 30 || stageName.contains(" ")) {
+			throw new InvalidNameException("Invalid stage name: " + stageName);
+		}
 
-				// Return the unique ID of the stage
-				return stageId;
+		// Check if the name already exists
+		if (stageNameExists(stageName)) {
+			throw new IllegalNameException("Stage name already exists: " + stageName);
+		}
+
+		// Check for invalid length
+		if (length < 5.0) {
+			throw new InvalidLengthException("Invalid stage length: " + length);
+		}
+
+		// Increment the nextStageId for the next stage
+		int stageId = ++stageIDCounter;
+		stageIDs.add(stageId);
+		// Map the stage to the race
+		Stage stage = new Stage(stageName, description, length, startTime, type);
+		stages.put(stageId, stage);
+		
+		if (getNumberOfStages(raceId) != 0){
+			int[] Originalarray = stagesRace.get(raceId);
+			int[] newArray = Arrays.copyOf(Originalarray,Originalarray.length + 1);
+			newArray[newArray.length - 1] = stageId;
+			stagesRace.replace(raceId, newArray);   
+		}else{
+			int[] newArray = {stageId};
+			stagesRace.put(raceId, newArray);
+		}
+
+		// Return the unique ID of the stage
+		return stageId;
 	}
 
 	@Override
@@ -556,34 +566,134 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	@Override
 	public void registerRiderResultsInStage(int stageId, int riderId, LocalTime... checkpoints)
-			throws IDNotRecognisedException, DuplicatedResultException, InvalidCheckpointTimesException,
-			InvalidStageStateException {
+			throws IDNotRecognisedException, DuplicatedResultException, InvalidCheckpointTimesException,InvalidStageStateException {
+    
+		// Step 2: Check if the stage ID is recognized
+		if (!stages.containsKey(stageId)) {
+			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+		}
+		if (!riders.containsKey(riderId)) {
+			throw new IDNotRecognisedException("Rider ID not recognized: " + stageId);
+		}
+
+		Stage stage = stages.get(stageId);
 		
+		// Step 3: Ensure the stage is in "waiting for results" state
+		if (stage.getState() != StageState.WAITING_FOR_RESULTS) {
+			throw new InvalidStageStateException("Stage is not in 'waiting for results' state.");
+		}
 		
+		// Step 4: Check if the rider has already registered a result for the stage
+		if (stage.hasResultForRider(riderId)) {
+			throw new DuplicatedResultException("Rider already has a result for the stage.");
+		}
+		
+		// Step 5: Verify if the length of checkpointTimes is valid
+		int expectedCheckpointCount = getStageCheckpoints(stageId).length + 2; // Add 2 for start and finish
+		if (checkpoints.length != expectedCheckpointCount) {
+			throw new InvalidCheckpointTimesException("Invalid number of checkpoint times."+ checkpoints.length + "!=" + expectedCheckpointCount);
+		}
+		
+		// Step 6: Record the rider's times for each checkpoint
+		stage.recordRiderResults(riderId, checkpoints);
 
 	}
 
 	@Override
 	public LocalTime[] getRiderResultsInStage(int stageId, int riderId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (!stages.containsKey(stageId)) {
+            throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+        }
+		if (!riders.containsKey(riderId)) {
+			throw new IDNotRecognisedException("Rider ID not recognized: " + stageId);
+		}
+
+		Stage stage = stages.get(stageId);
+
+		LocalTime[] riderResults = stage.getRiderResult(riderId);
+		LocalTime firstResult = riderResults[0];
+        LocalTime lastResult = riderResults[riderResults.length - 1];
+		int elapsedHours = lastResult.getHour() - firstResult.getHour();
+		int elapsedMinutes = lastResult.getMinute() - firstResult.getMinute();
+		int elapsedSeconds = lastResult.getSecond() - firstResult.getSecond();
+
+		// Adjust negative values
+		if (elapsedSeconds < 0) {
+			elapsedMinutes--;
+			elapsedSeconds += 60;
+		}
+		if (elapsedMinutes < 0) {
+			elapsedHours--;
+			elapsedMinutes += 60;
+		}
+
+        // Return the elapsed time as a LocalTime object
+        LocalTime elapsedtime =  LocalTime.of(elapsedHours, elapsedMinutes, elapsedSeconds);
+		LocalTime[] resultsWithElapsed = new LocalTime[riderResults.length + 1];
+		System.arraycopy(riderResults, 0, resultsWithElapsed, 0, riderResults.length);
+
+		// Set the last element of the new array to be the elapsed time
+		resultsWithElapsed[resultsWithElapsed.length - 1] = elapsedtime;
+
+        return resultsWithElapsed;
 	}
 
 	@Override
 	public LocalTime getRiderAdjustedElapsedTimeInStage(int stageId, int riderId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (!stages.containsKey(stageId)) {
+            throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+        }
+
+		// Retrieve checkpoint times for the rider in the specified stage
+		LocalTime[] checkpointTimes = getRiderResultsInStage(stageId, riderId);
+
+		if (checkpointTimes == null || checkpointTimes.length == 0) {
+			// No result registered for the rider in the stage
+			return null;
+		}
+
+		for (int rider: riderIDs){
+			
+		}
+
+		// Calculate the adjusted elapsed time based on the described rules
+		LocalTime adjustedElapsedTime = null;
+
+		return adjustedElapsedTime;
 	}
 
 	@Override
 	public void deleteRiderResultsInStage(int stageId, int riderId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
+
+        if (!riders.containsKey(riderId)) {
+            throw new IDNotRecognisedException("Rider ID not recognized: " + riderId);
+        }
+
+		if (!stages.containsKey(stageId)) {
+            throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+        }
+
+		Stage stage = stages.get(stageId);
+
+        // Remove rider's results
+        stage.removeRiderResultsInStage(riderId);
 
 	}
 
 	@Override
 	public int[] getRidersRankInStage(int stageId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
+
+		if (!stages.containsKey(stageId)) {
+            throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+        }
+		
+		int[] riderRankArr;
+
+		for (int i = 0; i < riderIDCounter; i++){
+			
+		}
 		return null;
 	}
 

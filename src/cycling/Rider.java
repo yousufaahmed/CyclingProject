@@ -12,6 +12,7 @@ public class Rider {
     // public Rider(String name, int id){this.name = name; this.id = id;}
 
     public Rider(String name, int yearOfBirth){
+        //shouldve made id like this instead of so many hashmaps...
         this.name = name;
         this.id = ++RiderIDCounter;
         this.yearOfBirth = yearOfBirth;

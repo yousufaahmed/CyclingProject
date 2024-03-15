@@ -1,10 +1,12 @@
 package cycling;
 import java.util.Random;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Duration;
 
 public class test {
     public static void main(String[] args) throws IllegalNameException, InvalidNameException, IDNotRecognisedException, InvalidLengthException,InvalidLocationException, InvalidStageStateException,
-    InvalidStageTypeException {
+    InvalidStageTypeException,DuplicatedResultException, InvalidCheckpointTimesException {
         MiniCyclingPortal miniCyclingPortal = new BadMiniCyclingPortalImpl();
         miniCyclingPortal.createRace("TourFR", "The famous cycling race");
         miniCyclingPortal.createRace("TourEU", "The famous cycling race in EU");
@@ -64,5 +66,24 @@ public class test {
             System.out.println(team);
         }
         miniCyclingPortal.createRider(2,"John",1985);
+        LocalTime start = LocalTime.of(8, 0); // Example start time
+        LocalTime checkpoint1 = LocalTime.of(8, 30); // Example checkpoint time 1
+        LocalTime checkpoint2 = LocalTime.of(9, 0); // Example checkpoint time 2
+        LocalTime checkpoint3 = LocalTime.of(9, 15); // Example checkpoint time 1
+        LocalTime finish = LocalTime.of(9, 30); // Example finish time
+        // Assemble the array of checkpoint times, including start and finish
+        LocalTime[] checkpointTimes = {start, checkpoint1, checkpoint2,checkpoint3, finish};
+        miniCyclingPortal.registerRiderResultsInStage(2,1, checkpointTimes);
+        LocalTime[] result = miniCyclingPortal.getRiderResultsInStage(2,1);
+        System.out.println(result);
+        for (LocalTime time : result) {
+            System.out.println(time);
+        }
+        miniCyclingPortal.deleteRiderResultsInStage(2, 1);
+        LocalTime[] result2 = miniCyclingPortal.getRiderResultsInStage(2,1);
+        System.out.println(result2);
+        for (LocalTime time2 : result2) {
+            System.out.println(time2);
+        }
     }
 }

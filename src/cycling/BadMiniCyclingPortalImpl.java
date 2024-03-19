@@ -1,7 +1,5 @@
 package cycling;
 
-import java.io.FileOutputStream;
-
 // TO DO:
 
 // CREATE A CLASSES UML DIAGRAM
@@ -10,9 +8,6 @@ import java.io.FileOutputStream;
 // ADD CLASS DOCUMENTATION USING /** */
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
-import javax.swing.text.TextAction;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -20,7 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.time.Duration;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * BadMiniCyclingPortal is a minimally compiling, but non-functioning implementor
@@ -734,8 +730,8 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	}
 
 	@Override
-	public void saveCyclingPortal(String filename) throws IOException {
-		try (FileOutputStream fileOut = new FileOutputStream(filename);
+    public void saveCyclingPortal(String filename) throws IOException {
+        try (FileOutputStream fileOut = new FileOutputStream(filename);
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
             out.writeObject(this); // Serialize the MiniCyclingPortal object
         } catch (IOException e) {
@@ -743,7 +739,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
             throw new IOException("Error occurred while saving the MiniCyclingPortal to file: " + e.getMessage());
         }
 
-	}
+    }
 
 	@Override
 	public void loadCyclingPortal(String filename) throws IOException, ClassNotFoundException {

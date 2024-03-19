@@ -2,11 +2,12 @@ package cycling;
 import java.util.Random;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.io.IOException;
 import java.time.Duration;
 
 public class test {
     public static void main(String[] args) throws IllegalNameException, InvalidNameException, IDNotRecognisedException, InvalidLengthException,InvalidLocationException, InvalidStageStateException,
-    InvalidStageTypeException,DuplicatedResultException, InvalidCheckpointTimesException {
+    InvalidStageTypeException,DuplicatedResultException, InvalidCheckpointTimesException, IOException {
         MiniCyclingPortal miniCyclingPortal = new BadMiniCyclingPortalImpl();
         miniCyclingPortal.createRace("TourFR", "The famous cycling race");
         miniCyclingPortal.createRace("TourEU", "The famous cycling race in EU");
@@ -80,10 +81,12 @@ public class test {
             System.out.println(time);
         }
         miniCyclingPortal.deleteRiderResultsInStage(2, 1);
-        LocalTime[] result2 = miniCyclingPortal.getRiderResultsInStage(2,1);
-        System.out.println(result2);
-        for (LocalTime time2 : result2) {
-            System.out.println(time2);
-        }
+        //LocalTime[] result2 = miniCyclingPortal.getRiderResultsInStage(2,1);
+        //System.out.println(result2);
+        //for (LocalTime time2 : result2) {
+         //   System.out.println(time2);
+        //}
+        String filename = "cyclingPortal.ser";
+        miniCyclingPortal.saveCyclingPortal(filename);
     }
 }

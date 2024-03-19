@@ -1,6 +1,8 @@
 package cycling;
 
-public class Rider {
+import java.io.Serializable;
+
+public class Rider implements Serializable{
     private String name;
     private int id;
     private int score;

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.util.Comparator;
 
 /**
  * BadMiniCyclingPortal is a minimally compiling, but non-functioning implementor
@@ -697,12 +698,22 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
             throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
         }
 		
-		int[] riderRankArr;
+		Map<Integer, LocalTime> riderTimes = new HashMap<>();
 
 		for (int i = 0; i < riderIDCounter; i++){
-			
+			LocalTime riderTime = getRiderAdjustedElapsedTimeInStage(stageId, riderIDs.get(i));
+			riderTimes.put(riderIDs.get(i), riderTime);
 		}
-		return null;
+		
+		List<Integer> sortedRiderIds = new ArrayList<>(riderTimes.keySet());
+        sortedRiderIds.sort(Comparator.comparing(riderTimes::get));
+
+        int[] riderRanks = new int[sortedRiderIds.size()];
+        for (int i = 0; i < sortedRiderIds.size(); i++) {
+            riderRanks[i] = sortedRiderIds.get(i);
+        }
+
+        return riderRanks;
 	}
 
 	@Override
@@ -738,7 +749,6 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
             // Re-throw the exception to indicate that an error occurred during file writing
             throw new IOException("Error occurred while saving the MiniCyclingPortal to file: " + e.getMessage());
         }
-
     }
 
 	@Override

@@ -645,21 +645,32 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
         }
 
 		// Retrieve checkpoint times for the rider in the specified stage
-		LocalTime[] checkpointTimes = getRiderResultsInStage(stageId, riderId);
+		LocalTime[] riderTimes = getRiderResultsInStage(stageId, riderId);
+		LocalTime riderElapsed = riderTimes[-1];
 
-		if (checkpointTimes == null || checkpointTimes.length == 0) {
+		if (riderTimes == null || riderTimes.length == 0) {
 			// No result registered for the rider in the stage
 			return null;
 		}
 
-		for (int rider: riderIDs){
-			
+		LocalTime adjustedTime = LocalTime.of(0, 0, 0);
+		LocalTime lowestTime = LocalTime.of(0, 0, 0);
+
+		for (int i = 0; i < riderIDs.size(); i++){
+			int rider = riderIDs.get(i);
+			LocalTime[] checkpointTimes = getRiderResultsInStage(stageId, rider);
+			if (checkpointTimes[-1] == riderElapsed){
+				continue;
+			} else {
+				if (isCloseTogether(checkpointTimes[-1], riderElapsed)){
+					adjustedTime = checkpointTimes[-1].isBefore(riderElapsed) ? checkpointTimes[-1]: riderElapsed;
+
+					lowestTime =  adjustedTime.isBefore(lowestTime) ? adjustedTime: lowestTime;
+				}
+			}
 		}
 
-		// Calculate the adjusted elapsed time based on the described rules
-		LocalTime adjustedElapsedTime = null;
-
-		return adjustedElapsedTime;
+		return lowestTime;
 	}
 
 	@Override

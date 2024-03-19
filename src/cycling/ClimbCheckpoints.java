@@ -1,8 +1,10 @@
 package cycling;
 
+import java.io.Serializable;
+
 // ADD INHERITANCE IF WE HAVE THE TIME
 
-public class ClimbCheckpoints extends Checkpoints{
+public class ClimbCheckpoints extends Checkpoints implements Serializable{
 
   private Double location;
   private CheckpointType type;

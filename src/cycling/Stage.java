@@ -1,4 +1,5 @@
 package cycling;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 // import javax.swing.plaf.nimbus.State;
-public class Stage {
+public class Stage implements Serializable{
 
 	private String stageName;
 	private String description;

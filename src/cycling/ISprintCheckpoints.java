@@ -1,7 +1,9 @@
 package cycling;
 // CHECK IF THIS WORKS
 
-public class ISprintCheckpoints extends Checkpoints{
+import java.io.Serializable;
+
+public class ISprintCheckpoints extends Checkpoints implements Serializable {
 
     public ISprintCheckpoints(Double location){
 		super(location);

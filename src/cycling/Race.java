@@ -2,7 +2,9 @@ package cycling;
 //import java.time.LocalDateTime;
 //import java.util.Date;
 
-public class Race {
+import java.io.Serializable;
+
+public class Race implements Serializable {
 	private String name;
 	private String description;
 	

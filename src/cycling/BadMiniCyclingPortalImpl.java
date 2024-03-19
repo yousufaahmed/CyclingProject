@@ -1,5 +1,7 @@
 package cycling;
 
+import java.io.FileOutputStream;
+
 // TO DO:
 
 // CREATE A CLASSES UML DIAGRAM
@@ -8,6 +10,7 @@ package cycling;
 // ADD CLASS DOCUMENTATION USING /** */
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import javax.swing.text.TextAction;
 import java.time.LocalDateTime;
@@ -721,7 +724,13 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	@Override
 	public void saveCyclingPortal(String filename) throws IOException {
-		// TODO Auto-generated method stub
+		try (FileOutputStream fileOut = new FileOutputStream(filename);
+             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            out.writeObject(this); // Serialize the MiniCyclingPortal object
+        } catch (IOException e) {
+            // Re-throw the exception to indicate that an error occurred during file writing
+            throw new IOException("Error occurred while saving the MiniCyclingPortal to file: " + e.getMessage());
+        }
 
 	}
 

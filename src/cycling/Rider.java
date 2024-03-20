@@ -2,11 +2,13 @@ package cycling;
 
 import java.io.Serializable;
 
+// MAYBE CHANGE THE ++RiderIDCounter to another hashmap like the other classes
+
 public class Rider implements Serializable{
     private String name;
     private int id;
     private int score;
-    private static int RiderIDCounter = 0;
+    // private static int RiderIDCounter = 0;
     public int yearOfBirth;
     // public Rider(){}
     // public Rider(String name){this.name = name;}
@@ -16,7 +18,7 @@ public class Rider implements Serializable{
     public Rider(String name, int yearOfBirth){
         //shouldve made id like this instead of so many hashmaps...
         this.name = name;
-        this.id = ++RiderIDCounter;
+        // this.id = ++RiderIDCounter;
         this.yearOfBirth = yearOfBirth;
     }
 

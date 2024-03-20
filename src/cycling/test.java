@@ -3,7 +3,6 @@ import java.util.Random;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.io.IOException;
-import java.time.Duration;
 
 public class test {
     public static void main(String[] args) throws IllegalNameException, InvalidNameException, IDNotRecognisedException, InvalidLengthException,InvalidLocationException, InvalidStageStateException,
@@ -67,17 +66,51 @@ public class test {
             System.out.println(team);
         }
         miniCyclingPortal.createRider(2,"John",1985);
-        LocalTime start = LocalTime.of(8, 0); // Example start time
-        LocalTime checkpoint1 = LocalTime.of(8, 30); // Example checkpoint time 1
-        LocalTime checkpoint2 = LocalTime.of(9, 0); // Example checkpoint time 2
-        LocalTime checkpoint3 = LocalTime.of(9, 15); // Example checkpoint time 1
-        LocalTime finish = LocalTime.of(9, 30); // Example finish time
-        // Assemble the array of checkpoint times, including start and finish
+        miniCyclingPortal.createRider(2,"Brian",1977);
+        miniCyclingPortal.createRider(2,"Connor",1991);
+        LocalTime start = LocalTime.of(8, 0); 
+        LocalTime checkpoint1 = LocalTime.of(8, 30);
+        LocalTime checkpoint2 = LocalTime.of(9, 0); 
+        LocalTime checkpoint3 = LocalTime.of(9, 15); 
+        LocalTime finish = LocalTime.of(9, 30); 
+
         LocalTime[] checkpointTimes = {start, checkpoint1, checkpoint2,checkpoint3, finish};
         miniCyclingPortal.registerRiderResultsInStage(2,1, checkpointTimes);
         LocalTime[] result = miniCyclingPortal.getRiderResultsInStage(2,1);
+
+        System.out.println("RESTULT LENGTH");   
+        System.out.println(result.length);
+
+        LocalTime start2 = LocalTime.of(8, 0); 
+        LocalTime checkpoint12 = LocalTime.of(8, 30); 
+        LocalTime checkpoint22 = LocalTime.of(9, 0); 
+        LocalTime checkpoint32 = LocalTime.of(9, 15); 
+        LocalTime finish2 = LocalTime.of(9, 31); 
+
+        LocalTime[] checkpointTimes2 = {start2, checkpoint12, checkpoint22,checkpoint32, finish2};
+        miniCyclingPortal.registerRiderResultsInStage(2,2, checkpointTimes2);
+        LocalTime[] result2 = miniCyclingPortal.getRiderResultsInStage(2,2);
+
+        LocalTime start3 = LocalTime.of(8, 0); // Example start time
+        LocalTime checkpoint13 = LocalTime.of(8, 30); // Example checkpoint time 1
+        LocalTime checkpoint23 = LocalTime.of(9, 0); // Example checkpoint time 2
+        LocalTime checkpoint33 = LocalTime.of(9, 15); // Example checkpoint time 1
+        LocalTime finish3 = LocalTime.of(9, 32); // Example finish time
+        // Assemble the array of checkpoint times, including start and finish
+        LocalTime[] checkpointTimes3 = {start3, checkpoint13, checkpoint23,checkpoint33, finish3};
+        miniCyclingPortal.registerRiderResultsInStage(2,3, checkpointTimes3);
+        LocalTime[] result3 = miniCyclingPortal.getRiderResultsInStage(2,3);
+
         System.out.println(result);
         for (LocalTime time : result) {
+            System.out.println(time);
+        }
+        System.out.println(result2);
+        for (LocalTime time : result2) {
+            System.out.println(time);
+        }
+        System.out.println(result3);
+        for (LocalTime time : result3) {
             System.out.println(time);
         }
         miniCyclingPortal.deleteRiderResultsInStage(2, 1);
@@ -86,7 +119,6 @@ public class test {
         //for (LocalTime time2 : result2) {
          //   System.out.println(time2);
         //}
-        String filename = "cyclingPortal.ser";
-        miniCyclingPortal.saveCyclingPortal(filename);
+        int[] resultTime = miniCyclingPortal.getRidersRankInStage(2);
     }
 }

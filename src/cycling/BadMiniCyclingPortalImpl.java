@@ -6,6 +6,7 @@ package cycling;
 // ADD SOME SORT OF INHERITANCE
 // ADD EXCEPTION HANDLING
 // ADD CLASS DOCUMENTATION USING /** */
+// ADD COMMENTS
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -644,7 +645,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
             throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
         }
 
-		// Retrieve checkpoint times for the rider in the specified stage
+		// Retrieve checkpoint times for the rider in the stage
 		LocalTime[] riderTimes = getRiderResultsInStage(stageId, riderId);
 		LocalTime riderElapsed = riderTimes[-1];
 
@@ -702,6 +703,9 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 		for (int i = 0; i < riderIDCounter; i++){
 			LocalTime riderTime = getRiderAdjustedElapsedTimeInStage(stageId, riderIDs.get(i));
+			if (riderTime == null){
+				return new int[0];
+			}
 			riderTimes.put(riderIDs.get(i), riderTime);
 		}
 		
@@ -719,7 +723,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	@Override
 	public LocalTime[] getRankedAdjustedElapsedTimesInStage(int stageId) throws IDNotRecognisedException {
 		// TODO Auto-generated method stub
-		return null;
+		return null; 
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,22 +89,6 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
     }
 
 ///////////////////////////////////////////////////////////////////
-    public BadMiniCyclingPortalImpl(){
-		this.raceIDs = new ArrayList<>();
-        this.stageIDs = new ArrayList<>();
-        this.races = new HashMap<>();
-        this.stages = new HashMap<>();
-        this.stagesRace = new HashMap<>();
-        this.cpIDs = new ArrayList<>();
-        this.climbCheckpoints = new HashMap<>();
-        this.ISprintCheckpoints = new HashMap<>();
-        this.checkpointsStages = new HashMap<>();
-
-        // You might want to initialize the counters based on existing data if applicable
-        CPIDCounter = 0;// logic to determine the starting value for CPIDCounter
-        raceIDCounter = 0;// logic to determine the starting value for raceIDCounter
-        stageIDCounter = 0;
-	}
 
 	@Override
 	public int[] getRaceIds() {
@@ -514,7 +499,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		// create raceID and add to list
 		int riderId = ++riderIDCounter;
 		riderIDs.add(riderId);
-
+  
 		// Create a Race object and associate it with the raceId
 		Rider rider = new Rider(name, yearOfBirth);
 		riders.put(riderId, rider);
@@ -605,19 +590,28 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
             throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
         }
 		if (!riders.containsKey(riderId)) {
-			throw new IDNotRecognisedException("Rider ID not recognized: " + stageId);
+			throw new IDNotRecognisedException("Rider ID not recognized: " + riderId);
 		}
 
 		Stage stage = stages.get(stageId);
 
 		LocalTime[] riderResults = stage.getRiderResult(riderId);
+		for (LocalTime time : riderResults) {
+            System.out.println(time);
+        }
+
+		System.out.println("length is " + riderResults.length);
+
+		// if (riderResults.length == 0) {
+		// 	return new LocalTime[0];
+		// }
+
 		LocalTime firstResult = riderResults[0];
         LocalTime lastResult = riderResults[riderResults.length - 1];
 		int elapsedHours = lastResult.getHour() - firstResult.getHour();
 		int elapsedMinutes = lastResult.getMinute() - firstResult.getMinute();
 		int elapsedSeconds = lastResult.getSecond() - firstResult.getSecond();
 
-		// Adjust negative values
 		if (elapsedSeconds < 0) {
 			elapsedMinutes--;
 			elapsedSeconds += 60;
@@ -627,12 +621,10 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 			elapsedMinutes += 60;
 		}
 
-        // Return the elapsed time as a LocalTime object
         LocalTime elapsedtime =  LocalTime.of(elapsedHours, elapsedMinutes, elapsedSeconds);
 		LocalTime[] resultsWithElapsed = new LocalTime[riderResults.length + 1];
 		System.arraycopy(riderResults, 0, resultsWithElapsed, 0, riderResults.length);
 
-		// Set the last element of the new array to be the elapsed time
 		resultsWithElapsed[resultsWithElapsed.length - 1] = elapsedtime;
 
         return resultsWithElapsed;
@@ -641,37 +633,37 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	@Override
 	public LocalTime getRiderAdjustedElapsedTimeInStage(int stageId, int riderId) throws IDNotRecognisedException {
 
+		
 		if (!stages.containsKey(stageId)) {
             throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
         }
 
-		// Retrieve checkpoint times for the rider in the stage
-		LocalTime[] riderTimes = getRiderResultsInStage(stageId, riderId);
-		LocalTime riderElapsed = riderTimes[-1];
+        LocalTime[] riderTimes = getRiderResultsInStage(stageId, riderId);
+        LocalTime riderElapsed = riderTimes[riderTimes.length - 1];
 
-		if (riderTimes == null || riderTimes.length == 0) {
-			// No result registered for the rider in the stage
-			return null;
-		}
+        if (riderTimes == null || riderTimes.length == 0) {
+            return null;
+        }
 
-		LocalTime adjustedTime = LocalTime.of(0, 0, 0);
-		LocalTime lowestTime = LocalTime.of(0, 0, 0);
+        LocalTime adjustedTime = LocalTime.of(0, 0, 0);
+        LocalTime lowestTime = LocalTime.of(0, 0, 0);
 
-		for (int i = 0; i < riderIDs.size(); i++){
-			int rider = riderIDs.get(i);
-			LocalTime[] checkpointTimes = getRiderResultsInStage(stageId, rider);
-			if (checkpointTimes[-1] == riderElapsed){
-				continue;
-			} else {
-				if (isCloseTogether(checkpointTimes[-1], riderElapsed)){
-					adjustedTime = checkpointTimes[-1].isBefore(riderElapsed) ? checkpointTimes[-1]: riderElapsed;
+        for (int i = 0; i < riderIDs.size(); i++){
+            int rider = riderIDs.get(i);
+			System.out.println("rider " + rider);
+            LocalTime[] checkpointTimes = getRiderResultsInStage(stageId, rider);
+            if (checkpointTimes[checkpointTimes.length - 1] == riderElapsed){
+                continue;
+            } else {
+                if (isCloseTogether(checkpointTimes[checkpointTimes.length - 1], riderElapsed)){
+                    adjustedTime = checkpointTimes[checkpointTimes.length - 1].isBefore(riderElapsed) ? checkpointTimes[checkpointTimes.length - 1]: riderElapsed;
 
-					lowestTime =  adjustedTime.isBefore(lowestTime) ? adjustedTime: lowestTime;
-				}
-			}
-		}
+                    lowestTime =  adjustedTime.isBefore(lowestTime) ? adjustedTime: lowestTime;
+                }
+            }
+        }
 
-		return lowestTime;
+        return lowestTime;
 	}
 
 	@Override
@@ -693,23 +685,27 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 	}
 
 	@Override
-	public int[] getRidersRankInStage(int stageId) throws IDNotRecognisedException {
+    public int[] getRidersRankInStage(int stageId) throws IDNotRecognisedException {
 
-		if (!stages.containsKey(stageId)) {
+        if (!stages.containsKey(stageId)) {
             throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
         }
-		
-		Map<Integer, LocalTime> riderTimes = new HashMap<>();
 
-		for (int i = 0; i < riderIDCounter; i++){
-			LocalTime riderTime = getRiderAdjustedElapsedTimeInStage(stageId, riderIDs.get(i));
-			if (riderTime == null){
-				return new int[0];
-			}
-			riderTimes.put(riderIDs.get(i), riderTime);
-		}
-		
-		List<Integer> sortedRiderIds = new ArrayList<>(riderTimes.keySet());
+        Map<Integer, LocalTime> riderTimes = new HashMap<>();
+
+		// CHANGE FOR ELAPSED TIME ONLY
+        for (int i = 0; i < riderIDCounter; i++){
+			int a = riderIDs.get(i);
+			System.out.println("THIS IS A:"+a);
+            LocalTime[] riderTimelist = getRiderResultsInStage(stageId, 1);
+			LocalTime riderTime = riderTimelist[riderTimelist.length - 1];
+            if (riderTime == null){
+                return new int[0];
+            }
+            riderTimes.put(riderIDs.get(i), riderTime);
+        }
+
+        List<Integer> sortedRiderIds = new ArrayList<>(riderTimes.keySet());
         sortedRiderIds.sort(Comparator.comparing(riderTimes::get));
 
         int[] riderRanks = new int[sortedRiderIds.size()];
@@ -718,12 +714,29 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
         }
 
         return riderRanks;
-	}
+    }
 
 	@Override
 	public LocalTime[] getRankedAdjustedElapsedTimesInStage(int stageId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null; 
+
+		if (!stages.containsKey(stageId)) {
+            throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+        }
+
+		LocalTime[] riderTimeArr = new LocalTime[0];
+
+		for (int i = 0; i < raceIDCounter; i++){
+			int rider = riderIDs.get(i);
+			LocalTime[] riderResults = getRiderResultsInStage(stageId, rider);
+			LocalTime finishTime = riderResults[-1];
+			LocalTime[] finishArray = new LocalTime[riderTimeArr.length + 1];
+			finishArray[i] = finishTime;
+			System.arraycopy(riderTimeArr, 0, finishArray, 0, riderTimeArr.length);
+		}
+
+		Arrays.sort(riderTimeArr);
+
+		return riderTimeArr;
 	}
 
 	@Override
@@ -740,8 +753,27 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	@Override
 	public void eraseCyclingPortal() {
-		// TODO Auto-generated method stub
+		raceIDs.clear();
+		races.clear();
+		stageIDs.clear();
+		stages.clear();
+		stagesRace.clear();
+		teamIDs.clear();
+		teams.clear();
+		teamRiders.clear();
+		riderIDs.clear();
+		riders.clear();
+		cpIDs.clear();
+		climbCheckpoints.clear();
+		ISprintCheckpoints.clear();
+		checkpointsStages.clear();
 
+		// Reset counters
+		raceIDCounter = 0;
+		stageIDCounter = 0;
+		teamIDCounter = 0;
+		riderIDCounter = 0;
+		CPIDCounter = 0;
 	}
 
 	@Override
@@ -760,5 +792,6 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		// TODO Auto-generated method stub
 
 	}
+	
 
 }

@@ -6,6 +6,7 @@ package cycling;
 // ADD SOME SORT OF INHERITANCE
 // ADD EXCEPTION HANDLING
 // ADD CLASS DOCUMENTATION USING /** */
+// ADD COMMENTS
 
 import java.io.IOException;
 import java.time.LocalDateTime;

@@ -113,12 +113,12 @@ public class test {
         for (LocalTime time : result3) {
             System.out.println(time);
         }
-        miniCyclingPortal.deleteRiderResultsInStage(2, 1);
+        // miniCyclingPortal.deleteRiderResultsInStage(2, 1);
         //LocalTime[] result2 = miniCyclingPortal.getRiderResultsInStage(2,1);
         //System.out.println(result2);
         //for (LocalTime time2 : result2) {
          //   System.out.println(time2);
         //}
-        int[] resultTime = miniCyclingPortal.getRidersRankInStage(2);
+        // int[] resultTime = miniCyclingPortal.getRidersRankInStage(2);
     }
 }

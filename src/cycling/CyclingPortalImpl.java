@@ -7,14 +7,11 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
-import javax.swing.text.TextAction;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.time.Duration;
 
 // TO DO:
 
@@ -22,6 +19,7 @@ import java.time.Duration;
 // ADD SOME SORT OF INHERITANCE
 // ADD EXCEPTION HANDLING
 // ADD CLASS DOCUMENTATION USING /** */
+// ADD COMMENTS
 // CREATE THE COVER SHEET WITH WHAT WE HAVE DONE INDIVIDUALLY
 
 // create array lists to store all riders, teams, stages, checkpoints etc
@@ -739,8 +737,58 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public int[] getRidersPointsInStage(int stageId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (!stages.containsKey(stageId)) {
+            throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+        }
+
+		int[] ridersRank = getRidersRankInStage(stageId);
+
+		if (ridersRank == null || ridersRank.length == 0){
+			return new int[0];
+		}
+
+		Stage stage = stages.get(stageId);
+
+		StageType stageType = stage.gettype();
+
+		int[] points;
+
+		// Sets the points to be the corresponding stage types points
+		switch (stageType){
+			case FLAT:
+				points = SprintPoints.getFlatPoints();
+				break;
+			case MEDIUM_MOUNTAIN:
+				points = SprintPoints.getHillyMoints();
+				break;
+			case HIGH_MOUNTAIN:
+				points = SprintPoints.getHighMPoints();
+				break;
+			case TT:
+				points = SprintPoints.getIndividualTTPoints();
+				break;
+			default:
+				points = SprintPoints.getFlatPoints();
+				break;
+		}
+
+		int[] riderRank = getRidersRankInStage(stageId);
+
+		int y = 0;
+		for (int i = 0; i < points.length; i++){
+			riderRank[i] = points[i];
+			y++;
+		}
+		
+		// If the number of riders is more than the maximum that can get points, the rest get 0 points.
+		if (!(riderRank.length == points.length)){
+			for (int i = y; y < riderRank.length - points.length - 1; i++){
+				riderRank[i] = 0;
+			}
+		}
+
+		return riderRank;
 	}
 
 	@Override

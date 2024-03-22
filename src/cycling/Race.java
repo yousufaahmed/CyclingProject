@@ -6,9 +6,16 @@ import java.io.Serializable;
 
 public class Race implements Serializable {
 	private String name;
+	private int id;
 	private String description;
+	private static int RaceIDCounter = 0;
 	
 
+	public Race(String name, String description, int id) {
+		this.name = name;
+		this.description = description;
+		this.id = ++RaceIDCounter;
+	}
 	public Race(String name, String description) {
 		this.name = name;
 		this.description = description;
@@ -20,6 +27,9 @@ public class Race implements Serializable {
 
 	public String getDescription() {
 		return description;
+	}
+	public int getId(){
+		return id;
 	}
 
 	

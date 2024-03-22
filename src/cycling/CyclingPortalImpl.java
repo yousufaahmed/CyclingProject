@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 import java.time.Duration;
 
 // TO DO:
@@ -38,11 +39,12 @@ public class CyclingPortalImpl implements CyclingPortal {
 	public List<Integer> raceIDs = new ArrayList<>();
 	public List<Integer> stageIDs = new ArrayList<>();
 	public Map<Integer, Race> races = new HashMap<>(); // raceid - race
+	public Map<String, Integer> racenameid = new HashMap<>();
 	public Map<Integer, Stage> stages = new HashMap<>(); // stageid - stage
 	public Map<Integer, int[]> stagesRace = new HashMap<>(); // raceid - [stageids]
 
 	public List<Integer> teamIDs = new ArrayList<>();
-	public Map<Integer, Team> teams = new HashMap<>(); // stageid - stageb  
+	public Map<Integer, Team> teams = new HashMap<>(); // teamid - team  
 	public Map<Integer, int[]> teamRiders = new HashMap<>(); // team - [riderids]
 	public List<Integer> riderIDs = new ArrayList<>();
 	public Map<Integer, Rider> riders = new HashMap<>(); // riderid - rider
@@ -109,8 +111,9 @@ public class CyclingPortalImpl implements CyclingPortal {
 		int raceId = ++raceIDCounter;
         raceIDs.add(raceId);
 		// Create a Race object and associate it with the raceId
-		Race race = new Race(name, description);
+		Race race = new Race(name, description, raceId);
 		races.put(raceId, race);
+		racenameid.put(name,raceId);
 
         return raceId;
 	}
@@ -594,9 +597,6 @@ public class CyclingPortalImpl implements CyclingPortal {
 		Stage stage = stages.get(stageId);
 
 		LocalTime[] riderResults = stage.getRiderResult(riderId);
-		for (LocalTime time : riderResults) {
-            System.out.println(time);
-        }
 
 		System.out.println("length is " + riderResults.length);
 
@@ -609,6 +609,8 @@ public class CyclingPortalImpl implements CyclingPortal {
 		int elapsedHours = lastResult.getHour() - firstResult.getHour();
 		int elapsedMinutes = lastResult.getMinute() - firstResult.getMinute();
 		int elapsedSeconds = lastResult.getSecond() - firstResult.getSecond();
+
+		
 
 		if (elapsedSeconds < 0) {
 			elapsedMinutes--;
@@ -640,21 +642,27 @@ public class CyclingPortalImpl implements CyclingPortal {
         LocalTime riderElapsed = riderTimes[riderTimes.length - 1];
 
         if (riderTimes == null || riderTimes.length == 0) {
-            return null;
+			return null;
         }
 
         LocalTime adjustedTime = LocalTime.of(0, 0, 0);
-        LocalTime lowestTime = LocalTime.of(0, 0, 0);
+        LocalTime lowestTime = riderElapsed;
 
         for (int i = 0; i < riderIDs.size(); i++){
             int rider = riderIDs.get(i);
 			System.out.println("rider " + rider);
             LocalTime[] checkpointTimes = getRiderResultsInStage(stageId, rider);
+
+			// for (LocalTime time : checkpointTimes) {
+			// 	System.out.println(time);
+			// }
+
             if (checkpointTimes[checkpointTimes.length - 1] == riderElapsed){
                 continue;
             } else {
                 if (isCloseTogether(checkpointTimes[checkpointTimes.length - 1], riderElapsed)){
-                    adjustedTime = checkpointTimes[checkpointTimes.length - 1].isBefore(riderElapsed) ? checkpointTimes[checkpointTimes.length - 1]: riderElapsed;
+                    adjustedTime = checkpointTimes[checkpointTimes.length - 1].isBefore(riderElapsed) ? 
+					checkpointTimes[checkpointTimes.length - 1]: riderElapsed;
 
                     lowestTime =  adjustedTime.isBefore(lowestTime) ? adjustedTime: lowestTime;
                 }
@@ -695,8 +703,9 @@ public class CyclingPortalImpl implements CyclingPortal {
         for (int i = 0; i < riderIDCounter; i++){
 			int a = riderIDs.get(i);
 			System.out.println("THIS IS A:"+a);
-            LocalTime[] riderTimelist = getRiderResultsInStage(stageId, 1);
+            LocalTime[] riderTimelist = getRiderResultsInStage(stageId, a);
 			LocalTime riderTime = riderTimelist[riderTimelist.length - 1];
+			System.out.println("the last time is:"+ riderTime);
             if (riderTime == null){
                 return new int[0];
             }
@@ -794,7 +803,59 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public void removeRaceByName(String name) throws NameNotRecognisedException {
+		if (!racenameid.containsKey(name)) {
+			throw new NameNotRecognisedException("Race with name '" + name + "' not found.");
+		}
+
+		int raceId = racenameid.get(name);
 		
+		racenameid.remove(name);
+			
+		// Remove the race from the races map
+		races.remove(raceId);
+		
+		// Remove the race ID from the raceIDs list
+		raceIDs.remove(raceId);
+		
+		if (stagesRace.containsKey(raceId)) {
+			int[] stageIdslist = stagesRace.get(raceId); // Retrieve the array of stage IDs
+			List<Integer> itemsToRemoveList = new ArrayList<>();
+            for (int item : stageIdslist) {
+				itemsToRemoveList.add(item);// put stage IDs to array list
+            }
+			stageIDs.removeAll(itemsToRemoveList); // remove the array list of stageids from stageIDs
+
+			// Iterate over the array of stage IDs and remove each stage
+			for (int stageId : stageIdslist) {
+				stages.remove(stageId); // Remove the stage from the stages map
+			}
+			
+			// Remove the entry corresponding to the race ID from the stagesRace map
+			stagesRace.remove(raceId);
+		}
+
+		
+		// Remove checkpoints associated with the race
+		if (stagesRace.containsKey(raceId)) {
+			int[] stageIdslist = stagesRace.get(raceId);
+			for (int stageId : stageIdslist){
+				if (checkpointsStages.containsKey(stageId)) {
+					int[] cpIdslist = checkpointsStages.get(stageId); // Retrieve the array of stage IDs
+					List<Integer> itemsToRemoveList = new ArrayList<>();
+					for (int item : cpIdslist) {
+						itemsToRemoveList.add(item);// put stage IDs to array list
+					}
+					cpIDs.removeAll(itemsToRemoveList); // remove the array list of stageids from stageIDs
+
+					// Iterate over the array of stage IDs and remove each stage
+					for (int cpId : cpIdslist) {
+						climbCheckpoints.remove(cpId); // Remove the stage from the stages map
+						ISprintCheckpoints.remove(cpId);
+					}
+					
+				}
+			}
+	    }
 
 	}
 

@@ -404,7 +404,7 @@ public interface MiniCyclingPortal extends Serializable {
 	void deleteRiderResultsInStage(int stageId, int riderId) throws IDNotRecognisedException;
 
 	/**
-	 * Get the riders finished position in a a stage.
+	 * Get the riders finished position in a stage.
 	 * <p>
 	 * The state of this MiniCyclingPortal must be unchanged if any
 	 * exceptions are thrown.

@@ -1,5 +1,4 @@
 package cycling;
-import java.util.Random;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.io.IOException;
@@ -10,12 +9,8 @@ public class test {
         CyclingPortal miniCyclingPortal = new CyclingPortalImpl();
         miniCyclingPortal.createRace("TourFR", "The famous cycling race");
         miniCyclingPortal.createRace("TourEU", "The famous cycling race in EU");
-        Random random = new Random();
 
         // Generate a random integer
-        int randomNumber = random.nextInt(Integer.MAX_VALUE);
-
-        System.out.println("Random Integer: " + randomNumber);
 
         int[] raceIds = miniCyclingPortal.getRaceIds();
         System.out.println(raceIds);
@@ -78,9 +73,6 @@ public class test {
         miniCyclingPortal.registerRiderResultsInStage(2,1, checkpointTimes);
         LocalTime[] result = miniCyclingPortal.getRiderResultsInStage(2,1);
 
-        System.out.println("RESTULT LENGTH");   
-        System.out.println(result.length);
-
         LocalTime start2 = LocalTime.of(8, 0); 
         LocalTime checkpoint12 = LocalTime.of(8, 30,0); 
         LocalTime checkpoint22 = LocalTime.of(9, 0,0); 
@@ -119,6 +111,19 @@ public class test {
         int[] rankresult = miniCyclingPortal.getRidersRankInStage(2);
         for (int ac : rankresult) {
             System.out.println(ac);
+        }
+        LocalTime[] adjresult = miniCyclingPortal.getRankedAdjustedElapsedTimesInStage(2);
+        for (LocalTime tim : adjresult) {
+            System.out.println(tim);
+        }
+        int[] gnrank = miniCyclingPortal.getRidersGeneralClassificationRank(1);
+        for (int ac : gnrank) {
+            System.out.println(ac);
+        }
+
+        LocalTime[] gntime = miniCyclingPortal.getGeneralClassificationTimesInRace(1);
+        for (LocalTime tim : gntime) {
+            System.out.println(tim);
         }
 
          

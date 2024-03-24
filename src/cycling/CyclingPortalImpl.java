@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +85,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	private boolean isCloseTogether(LocalTime time1, LocalTime time2) {
         // Assuming "close together" means less than one second difference
-        return Math.abs(time1.toNanoOfDay() - time2.toNanoOfDay()) < 1_000_000_000L;
+        return Math.abs(time1.toNanoOfDay() - time2.toNanoOfDay()) <= 1_000_000_000L;
     }
 
 ///////////////////////////////////////////////////////////////////
@@ -597,11 +598,9 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 		LocalTime[] riderResults = stage.getRiderResult(riderId);
 
-		System.out.println("length is " + riderResults.length);
-
-		// if (riderResults.length == 0) {
-		// 	return new LocalTime[0];
-		// }
+		if (riderResults.length == 0) {
+			return new LocalTime[0];
+		}
 
 		LocalTime firstResult = riderResults[0];
         LocalTime lastResult = riderResults[riderResults.length - 1];
@@ -649,12 +648,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 
         for (int i = 0; i < riderIDs.size(); i++){
             int rider = riderIDs.get(i);
-			System.out.println("rider " + rider);
             LocalTime[] checkpointTimes = getRiderResultsInStage(stageId, rider);
-
-			// for (LocalTime time : checkpointTimes) {
-			// 	System.out.println(time);
-			// }
 
             if (checkpointTimes[checkpointTimes.length - 1] == riderElapsed){
                 continue;
@@ -698,13 +692,12 @@ public class CyclingPortalImpl implements CyclingPortal {
 
         Map<Integer, LocalTime> riderTimes = new HashMap<>();
 
-		// CHANGE FOR ELAPSED TIME ONLY
         for (int i = 0; i < riderIDCounter; i++){
 			int a = riderIDs.get(i);
-			System.out.println("THIS IS A:"+a);
+
             LocalTime[] riderTimelist = getRiderResultsInStage(stageId, a);
 			LocalTime riderTime = riderTimelist[riderTimelist.length - 1];
-			System.out.println("the last time is:"+ riderTime);
+
             if (riderTime == null){
                 return new int[0];
             }
@@ -729,18 +722,15 @@ public class CyclingPortalImpl implements CyclingPortal {
             throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
         }
 
-		LocalTime[] riderTimeArr = new LocalTime[0];
 
-		for (int i = 0; i < raceIDCounter; i++){
-			int rider = riderIDs.get(i);
-			LocalTime[] riderResults = getRiderResultsInStage(stageId, rider);
-			LocalTime finishTime = riderResults[-1];
-			LocalTime[] finishArray = new LocalTime[riderTimeArr.length + 1];
-			finishArray[i] = finishTime;
-			System.arraycopy(riderTimeArr, 0, finishArray, 0, riderTimeArr.length);
+		int[] riderRankList = getRidersRankInStage(stageId);
+		LocalTime[] riderTimeArr = new LocalTime[riderRankList.length];
+
+		for (int i = 0; i < riderRankList.length; i++){
+			int riderId = riderRankList[i];
+			LocalTime adjtime = getRiderAdjustedElapsedTimeInStage(stageId, riderId);
+			riderTimeArr[i] = adjtime;
 		}
-
-		Arrays.sort(riderTimeArr);
 
 		return riderTimeArr;
 	}
@@ -910,8 +900,41 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public LocalTime[] getGeneralClassificationTimesInRace(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+		if (!races.containsKey(raceId)) {
+            throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
+        }
+        int[] raceStageIds = stagesRace.get(raceId);
+
+        // Initialize a map to store rider IDs and their total adjusted elapsed times
+        Map<Integer, LocalTime> riderTotalTimes = new HashMap<>();
+
+        // Iterate over each stage in the race
+        for (int stageId : raceStageIds) {
+            // Get the ranked list of riders' IDs for the current stage
+            int[] stageRiderIds = getRidersRankInStage(stageId);
+
+            // Calculate and update the total adjusted elapsed time for each rider
+            for (int riderId : stageRiderIds) {
+                LocalTime elapsedTime = getRiderAdjustedElapsedTimeInStage(stageId, riderId);
+                // Update the total elapsed time for the rider
+                LocalTime currentTotalTime = riderTotalTimes.getOrDefault(riderId, LocalTime.MIN);
+                LocalTime newTotalTime = currentTotalTime.plusHours(elapsedTime.getHour())
+                        .plusMinutes(elapsedTime.getMinute())
+                        .plusSeconds(elapsedTime.getSecond());
+                riderTotalTimes.put(riderId, newTotalTime);
+            }
+        }
+
+        // Create an array of LocalTime for general classification times
+        LocalTime[] generalClassificationTimes = new LocalTime[riderTotalTimes.size()];
+
+        // Populate the array with total times of riders
+        int i = 0;
+        for (LocalTime time : riderTotalTimes.values()) {
+            generalClassificationTimes[i++] = time;
+        }
+
+        return generalClassificationTimes;
 	}
 
 	@Override
@@ -928,9 +951,41 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public int[] getRidersGeneralClassificationRank(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+		if (!races.containsKey(raceId)) {
+        throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
+		}
+		int[] raceStageIds = stagesRace.get(raceId);
+
+		// Initialize a map to store rider IDs and their total adjusted elapsed times
+		Map<Integer, LocalTime> riderTotalTimes = new HashMap<>();
+
+		// Iterate over each stage in the race
+		for (int stageId : raceStageIds) {
+			// Get the ranked list of riders' IDs for the current stage
+			int[] stageRiderIds = getRidersRankInStage(stageId);
+
+			// Calculate and update the total adjusted elapsed time for each rider
+			for (int riderId : stageRiderIds) {
+				LocalTime elapsedTime = getRiderAdjustedElapsedTimeInStage(stageId, riderId);
+				// Update the total elapsed time for the rider
+				LocalTime currentTotalTime = riderTotalTimes.getOrDefault(riderId, LocalTime.MIN);
+				LocalTime newTotalTime = currentTotalTime.plusHours(elapsedTime.getHour())
+														.plusMinutes(elapsedTime.getMinute())
+														.plusSeconds(elapsedTime.getSecond());
+				riderTotalTimes.put(riderId, newTotalTime);
+			}
+		}
+
+		// Create a list of rider IDs sorted by their total adjusted elapsed times
+		List<Integer> sortedRiderIds = new ArrayList<>(riderTotalTimes.keySet());
+		Collections.sort(sortedRiderIds, Comparator.comparing(riderTotalTimes::get, Comparator.nullsFirst(Comparator.naturalOrder())));
+
+		// Convert the sorted rider IDs to an array
+		int[] rankedRiderIds = sortedRiderIds.stream().mapToInt(Integer::intValue).toArray();
+
+		return rankedRiderIds;
 	}
+	
 
 	@Override
 	public int[] getRidersPointClassificationRank(int raceId) throws IDNotRecognisedException {

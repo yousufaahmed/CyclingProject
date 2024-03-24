@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-import java.util.Comparator;
 
 /**
  * BadMiniCyclingPortal is a minimally compiling, but non-functioning implementor

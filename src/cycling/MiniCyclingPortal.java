@@ -376,7 +376,7 @@ public interface MiniCyclingPortal extends Serializable {
 	 * should be the same as the first of all these riders, even if the real gap
 	 * between the 200th and the 1st rider is much bigger than 1 second. There is no
 	 * adjustments on elapsed time on time-trials.
-	 * <p>
+	 * <p> 
 	 * The state of this MiniCyclingPortal must be unchanged if any
 	 * exceptions are thrown.
 	 * 

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class test {
     public static void main(String[] args) throws IllegalNameException, InvalidNameException, IDNotRecognisedException, InvalidLengthException,InvalidLocationException, InvalidStageStateException,
-    InvalidStageTypeException,DuplicatedResultException, InvalidCheckpointTimesException, IOException, NameNotRecognisedException{
+    InvalidStageTypeException,DuplicatedResultException, InvalidCheckpointTimesException, IOException, NameNotRecognisedException, ClassNotFoundException{
         CyclingPortal miniCyclingPortal = new CyclingPortalImpl();
         miniCyclingPortal.createRace("TourFR", "The famous cycling race");
         miniCyclingPortal.createRace("TourEU", "The famous cycling race in EU");
@@ -36,7 +36,7 @@ public class test {
 
         int nstage = miniCyclingPortal.getNumberOfStages(1);
         System.out.println(nstage);
-        //miniCyclingPortal.addStageToRace(1,"Theboulder3","An epic climb against boulders 3",7.5,startTime,StageType.HIGH_MOUNTAIN);
+        // miniCyclingPortal.addStageToRace(1,"Theboulder3","An epic climb against boulders 3",7.5,startTime,StageType.HIGH_MOUNTAIN);
         miniCyclingPortal.removeStageById(1);
         int nostage = miniCyclingPortal.getNumberOfStages(1);
         System.out.println(nostage);
@@ -126,12 +126,40 @@ public class test {
             System.out.println(tim);
         }
 
-         
-        //LocalTime[] result2 = miniCyclingPortal.getRiderResultsInStage(2,1);
-        //System.out.println(result2);
-        //for (LocalTime time2 : result2) {
-         //   System.out.println(time2);
-        //}
-        //int[] resultTime = miniCyclingPortal.getRidersRankInStage(2);
+        int[] points = miniCyclingPortal.getRidersPointsInStage(2);
+        for (int i : points) {
+            System.out.println(i);
+        }
+
+        int[] mpoints = miniCyclingPortal.getRidersMountainPointsInStage(2);
+        for (int i : mpoints) {
+            System.out.println(i);
+        }
+
+        miniCyclingPortal.saveCyclingPortal("cyclingPortal");
+
+
+        // LocalTime[] result2 = miniCyclingPortal.getRiderResultsInStage(2,1);
+        // System.out.println(result2);
+        // for (LocalTime time2 : result2) {
+        //    System.out.println(time2);
+        // }
+        // int[] resultTime = miniCyclingPortal.getRidersRankInStage(2);
+
+        // miniCyclingPortal.loadCyclingPortal("cyclingPortal");
+
+        // System.out.println(miniCyclingPortal.getRaceIds());
+        
+        System.out.println("RiderPOINTS");
+        int[] points1 = miniCyclingPortal.getRidersPointsInRace(1);
+        for (int i : points1) {
+            System.out.println(i);
+        }
+
+        System.out.println("MountainPOINTS");
+        int[] points2 = miniCyclingPortal.getRidersMountainPointsInRace(1);
+        for (int i : points2) {
+            System.out.println(i);
+        }
     }
 }

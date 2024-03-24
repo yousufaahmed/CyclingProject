@@ -7,23 +7,25 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
-import java.time.Duration;
 
 // TO DO:
 
 // CREATE A CLASSES UML DIAGRAM
-// ADD SOME SORT OF INHERITANCE
+// ADD SOME SORT OF INHERITANCE - DONE 🤠
 // ADD EXCEPTION HANDLING
 // ADD CLASS DOCUMENTATION USING /** */
 // ADD COMMENTS
 // CREATE THE COVER SHEET WITH WHAT WE HAVE DONE INDIVIDUALLY
+// LOOK FOR CODE REPETITION AND TRY TO MAKE REUSABLE CODE
+// MAKE A README FILE
 
 // create array lists to store all riders, teams, stages, checkpoints etc
 
@@ -722,7 +724,8 @@ public class CyclingPortalImpl implements CyclingPortal {
             throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
         }
 
-
+		// SORT IT BY FINISH TIME INSTEAD 
+		// WE DID THE ADJUSTED TIME WRONG IT SHOULD BE CONSECUTIVE
 		int[] riderRankList = getRidersRankInStage(stageId);
 		LocalTime[] riderTimeArr = new LocalTime[riderRankList.length];
 
@@ -744,13 +747,13 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 		int[] ridersRank = getRidersRankInStage(stageId);
 
-		if (ridersRank == null || ridersRank.length == 0){
-			return new int[0];
-		}
-
 		Stage stage = stages.get(stageId);
 
 		StageType stageType = stage.gettype();
+
+		if (ridersRank == null || ridersRank.length == 0 || !(stageType == StageType.FLAT || stageType == StageType.TT)){
+			return new int[0];
+		}
 
 		int[] points;
 
@@ -759,45 +762,79 @@ public class CyclingPortalImpl implements CyclingPortal {
 			case FLAT:
 				points = SprintPoints.getFlatPoints();
 				break;
+			case TT:
+				points = SprintPoints.getIndividualTTPoints();
+				break;
+			default:
+				points = new int[0];
+				break;
+		}
+
+		// Replaces the ridersID with their relative points
+		int y = 0;
+		for (int i = 0; i < ridersRank.length; i++){
+			ridersRank[i] = points[i];
+			y++;
+		}
+		
+		// If the number of riders is more than the maximum that can get points, the rest get 0 points.
+		if (!(ridersRank.length == points.length)){
+			for (int i = y; y < ridersRank.length - points.length - 1; i++){
+				ridersRank[i] = 0;
+			}
+		}
+
+		return ridersRank;
+	}
+
+	@Override
+	public int[] getRidersMountainPointsInStage(int stageId) throws IDNotRecognisedException {
+
+		if (!stages.containsKey(stageId)) {
+            throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
+        }
+
+		LocalTime[] ridersRank = getRankedAdjustedElapsedTimesInStage(stageId);
+		int nRiders = ridersRank.length;
+
+		Stage stage = stages.get(stageId);
+
+		StageType stageType = stage.gettype();
+
+		if (ridersRank == null || ridersRank.length == 0 || !(stageType == StageType.MEDIUM_MOUNTAIN || stageType == StageType.HIGH_MOUNTAIN)){
+			return new int[0];
+		}
+
+		int[] points;
+		int[] riderPoints = new int[nRiders];
+
+		// Sets the points to be the corresponding stage types points
+		switch (stageType){
 			case MEDIUM_MOUNTAIN:
 				points = SprintPoints.getHillyMPoints();
 				break;
 			case HIGH_MOUNTAIN:
 				points = SprintPoints.getHighMPoints();
 				break;
-			case TT:
-				points = SprintPoints.getIndividualTTPoints();
-				break;
 			default:
-				points = SprintPoints.getFlatPoints();
+				points = new int[0];
 				break;
 		}
 
-		int[] riderRank = getRidersRankInStage(stageId);
-
 		int y = 0;
-		for (int i = 0; i < points.length; i++){
-			riderRank[i] = points[i];
+		for (int i = 0; i < ridersRank.length; i++){
+			riderPoints[i] = points[i];
 			y++;
 		}
 		
 		// If the number of riders is more than the maximum that can get points, the rest get 0 points.
-		if (!(riderRank.length == points.length)){
-			for (int i = y; y < riderRank.length - points.length - 1; i++){
-				riderRank[i] = 0;
+		if (!(nRiders == points.length)){
+			for (int i = y; y < nRiders - points.length - 1; i++){
+				riderPoints[i] = 0;
 			}
 		}
 
-		return riderRank;
-	}
-
-	@Override
-	public int[] getRidersMountainPointsInStage(int stageId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-
-		// Whoever does each checkpoint the fastest gets the points for those checkpoints
-		//Sorted by finished time
-		return null;
+		return riderPoints;
 	}
 
 	@Override
@@ -830,6 +867,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 		try (FileOutputStream fileOut = new FileOutputStream(filename);
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
             out.writeObject(this); // Serialize the MiniCyclingPortal object
+
         } catch (IOException e) {
             // Re-throw the exception to indicate that an error occurred during file writing
             throw new IOException("Error occurred while saving the MiniCyclingPortal to file: " + e.getMessage());
@@ -839,8 +877,15 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public void loadCyclingPortal(String filename) throws IOException, ClassNotFoundException {
-		// TODO Auto-generated method stub
+		try (FileInputStream fileIn = new FileInputStream(filename);
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            in.readObject();
 
+        } catch (IOException e) {
+            throw new IOException("Error occurred while saving the MiniCyclingPortal to file: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Error, class not found: " + e.getMessage());
+        }
 	}
 
 	@Override
@@ -943,13 +988,46 @@ public class CyclingPortalImpl implements CyclingPortal {
 	@Override
 	public int[] getRidersPointsInRace(int raceId) throws IDNotRecognisedException {
 		// TODO Auto-generated method stub
-		return null;
+
+		if (!races.containsKey(raceId)) {
+            throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
+        }
+
+		int[] raceStages = stagesRace.get(raceId);
+
+		int[] riderPointsRace = new int[riderIDs.size()];
+
+
+		for (int i = 0; i < raceStages.length; i++){
+			int[] currentPoints = getRidersPointsInStage(raceStages[i]);
+			for (int j = 0; j < currentPoints.length; j++){
+				riderPointsRace[j] += currentPoints[j];
+			}
+		}
+
+		return riderPointsRace;
 	}
 
 	@Override
 	public int[] getRidersMountainPointsInRace(int raceId) throws IDNotRecognisedException {
 		// TODO Auto-generated method stub
-		return null;
+
+		if (!races.containsKey(raceId)) {
+            throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
+        }
+
+		int[] raceStages = stagesRace.get(raceId);
+
+		int[] riderPointsRace = new int[riderIDs.size()];
+
+		for (int i = 0; i < raceStages.length; i++){
+			int[] currentPoints = getRidersMountainPointsInStage(raceStages[i]);
+			for (int j = 0; j < currentPoints.length; j++){
+				riderPointsRace[j] += currentPoints[j];
+			}
+		}
+
+		return riderPointsRace;
 	}
 
 	@Override
@@ -958,6 +1036,11 @@ public class CyclingPortalImpl implements CyclingPortal {
         throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
 		}
 		int[] raceStageIds = stagesRace.get(raceId);
+
+		System.out.println("RACEEEE");
+		for (int i : raceStageIds) {
+            System.out.println(i);
+        }
 
 		// Initialize a map to store rider IDs and their total adjusted elapsed times
 		Map<Integer, LocalTime> riderTotalTimes = new HashMap<>();

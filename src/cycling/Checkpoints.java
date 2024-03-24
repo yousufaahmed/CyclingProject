@@ -1,6 +1,8 @@
 package cycling;
 
-public class Checkpoints{
+import java.io.Serializable;
+
+public class Checkpoints implements Serializable{
 
     private Double location;
 

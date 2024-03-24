@@ -24,7 +24,7 @@ public class SprintPoints {
         return flatPoints;
     }
 
-    public static int[] getHillyMoints(){
+    public static int[] getHillyMPoints(){
         return hillyMPoints;
     }
 

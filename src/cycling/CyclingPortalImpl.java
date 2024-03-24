@@ -770,7 +770,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 				points = SprintPoints.getFlatPoints();
 				break;
 			case MEDIUM_MOUNTAIN:
-				points = SprintPoints.getHillyMoints();
+				points = SprintPoints.getHillyMPoints();
 				break;
 			case HIGH_MOUNTAIN:
 				points = SprintPoints.getHighMPoints();
@@ -804,6 +804,9 @@ public class CyclingPortalImpl implements CyclingPortal {
 	@Override
 	public int[] getRidersMountainPointsInStage(int stageId) throws IDNotRecognisedException {
 		// TODO Auto-generated method stub
+
+		// Whoever does each checkpoint the fastest gets the points for those checkpoints
+		//Sorted by finished time
 		return null;
 	}
 

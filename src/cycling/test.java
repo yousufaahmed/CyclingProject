@@ -67,7 +67,7 @@ public class test {
         LocalTime checkpoint1 = LocalTime.of(8, 30);
         LocalTime checkpoint2 = LocalTime.of(9, 0); 
         LocalTime checkpoint3 = LocalTime.of(9, 15); 
-        LocalTime finish = LocalTime.of(9, 30,2,2); 
+        LocalTime finish = LocalTime.of(9, 30,2); 
 
         LocalTime[] checkpointTimes = {start, checkpoint1, checkpoint2,checkpoint3, finish};
         miniCyclingPortal.registerRiderResultsInStage(2,1, checkpointTimes);
@@ -77,7 +77,7 @@ public class test {
         LocalTime checkpoint12 = LocalTime.of(8, 30,0); 
         LocalTime checkpoint22 = LocalTime.of(9, 0,0); 
         LocalTime checkpoint32 = LocalTime.of(9, 15,0); 
-        LocalTime finish2 = LocalTime.of(9, 30,1,5); 
+        LocalTime finish2 = LocalTime.of(9, 30,1); 
 
         LocalTime[] checkpointTimes2 = {start2, checkpoint12, checkpoint22,checkpoint32, finish2};
         miniCyclingPortal.registerRiderResultsInStage(2,2, checkpointTimes2);
@@ -87,7 +87,7 @@ public class test {
         LocalTime checkpoint13 = LocalTime.of(8, 30); // Example checkpoint time 1
         LocalTime checkpoint23 = LocalTime.of(9, 0); // Example checkpoint time 2
         LocalTime checkpoint33 = LocalTime.of(9, 15); // Example checkpoint time 1
-        LocalTime finish3 = LocalTime.of(9, 30,3,3); // Example finish time
+        LocalTime finish3 = LocalTime.of(9, 30,3); // Example finish time
         // Assemble the array of checkpoint times, including start and finish
         LocalTime[] checkpointTimes3 = {start3, checkpoint13, checkpoint23,checkpoint33, finish3};
         miniCyclingPortal.registerRiderResultsInStage(2,3, checkpointTimes3);
@@ -159,6 +159,10 @@ public class test {
         System.out.println("MountainPOINTS");
         int[] points2 = miniCyclingPortal.getRidersMountainPointsInRace(1);
         for (int i : points2) {
+            System.out.println(i);
+        }
+        int[] pointrank = miniCyclingPortal.getRidersMountainPointClassificationRank(1);
+        for (int i : pointrank) {
             System.out.println(i);
         }
     }

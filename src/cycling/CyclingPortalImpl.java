@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 // TO DO:
 
@@ -26,6 +27,7 @@ import java.util.Map;
 // CREATE THE COVER SHEET WITH WHAT WE HAVE DONE INDIVIDUALLY
 // LOOK FOR CODE REPETITION AND TRY TO MAKE REUSABLE CODE
 // MAKE A README FILE
+// FIX THE ADJUSTED TIME TO MAKE IT CONCURRENT
 
 // create array lists to store all riders, teams, stages, checkpoints etc
 
@@ -50,6 +52,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 	public Map<Integer, int[]> teamRiders = new HashMap<>(); // team - [riderids]
 	public List<Integer> riderIDs = new ArrayList<>();
 	public Map<Integer, Rider> riders = new HashMap<>(); // riderid - rider
+	public List<String> teamName = new ArrayList<>();
 
 	public List<Integer> cpIDs = new ArrayList<>(); // checkpointids
 	public Map<Integer, ClimbCheckpoints> climbCheckpoints = new HashMap<>(); // checkpointid - climbcheckpoint
@@ -76,14 +79,14 @@ public class CyclingPortalImpl implements CyclingPortal {
 		return false;
 	}
 
-	private boolean teamNameExists(String name) {
-		for (Stage existingStage : stages.values()) {
-			if (existingStage.getstageName() == name) {
-				return true;
-			}
-		}
-		return false;
-	}
+	// private boolean teamNameExists(String name) {
+	// 	for (Stage existingStage : stages.values()) {
+	// 		if (existingStage.getstageName() == name) {
+	// 			return true;
+	// 		}
+	// 	}
+	// 	return false;
+	// }
 
 	private boolean isCloseTogether(LocalTime time1, LocalTime time2) {
         // Assuming "close together" means less than one second difference
@@ -442,13 +445,14 @@ public class CyclingPortalImpl implements CyclingPortal {
         }
 
         // Check if the name already exists
-        if (teamNameExists(name)) {
+        if (teamName.contains(name)) {
             throw new IllegalNameException("name already exists");
         }
 
         // create raceID and add to list
 		int teamId = ++teamIDCounter;
         teamIDs.add(teamId);
+		teamName.add(name);
 
 		// Create a Race object and associate it with the raceId
 		Team team = new Team(name, description);
@@ -639,11 +643,12 @@ public class CyclingPortalImpl implements CyclingPortal {
         }
 
         LocalTime[] riderTimes = getRiderResultsInStage(stageId, riderId);
-        LocalTime riderElapsed = riderTimes[riderTimes.length - 1];
-
-        if (riderTimes == null || riderTimes.length == 0) {
+		if (riderTimes == null || riderTimes.length == 0) {
 			return null;
         }
+		
+        LocalTime riderElapsed = riderTimes[riderTimes.length - 1];
+
 
         LocalTime adjustedTime = LocalTime.of(0, 0, 0);
         LocalTime lowestTime = riderElapsed;
@@ -698,12 +703,15 @@ public class CyclingPortalImpl implements CyclingPortal {
 			int a = riderIDs.get(i);
 
             LocalTime[] riderTimelist = getRiderResultsInStage(stageId, a);
-			LocalTime riderTime = riderTimelist[riderTimelist.length - 1];
+			if (riderTimelist.length == 0 || riderTimelist == null){
+                LocalTime riderTime = null;
+            }else{
+				LocalTime riderTime = riderTimelist[riderTimelist.length - 1];
+			    riderTimes.put(riderIDs.get(i), riderTime);
+			}
 
-            if (riderTime == null){
-                return new int[0];
-            }
-            riderTimes.put(riderIDs.get(i), riderTime);
+           
+            //riderTimes.put(riderIDs.get(i), riderTime);
         }
 
         List<Integer> sortedRiderIds = new ArrayList<>(riderTimes.keySet());
@@ -1037,11 +1045,6 @@ public class CyclingPortalImpl implements CyclingPortal {
 		}
 		int[] raceStageIds = stagesRace.get(raceId);
 
-		System.out.println("RACEEEE");
-		for (int i : raceStageIds) {
-            System.out.println(i);
-        }
-
 		// Initialize a map to store rider IDs and their total adjusted elapsed times
 		Map<Integer, LocalTime> riderTotalTimes = new HashMap<>();
 
@@ -1075,14 +1078,73 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public int[] getRidersPointClassificationRank(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+		if (!races.containsKey(raceId)) {
+			throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
+		}
+	
+		int[] raceStages = stagesRace.get(raceId);
+		int [] riderIds = getRidersGeneralClassificationRank(raceId);
+
+		int[] riderPointsRace = new int[riderIDs.size()];
+
+		Map<Integer, Integer> riderTotalPoints= new HashMap<>();
+
+
+		for (int i = 0; i < raceStages.length; i++){
+			int[] currentPoints = getRidersPointsInStage(raceStages[i]);
+			for (int j = 0; j < currentPoints.length; j++){
+				riderPointsRace[j] += currentPoints[j];
+			}
+		}
+		
+		for (int i = 0; i < riderIds.length; i++) {
+			if (riderPointsRace[i] != 0) {
+				riderTotalPoints.put(riderIds[i], riderPointsRace[i]);
+			}
+		}
+		Set<Integer> riderIdsSet = riderTotalPoints.keySet();
+		Integer[] riderIdsArray = riderIdsSet.toArray(new Integer[0]);
+
+		// Convert Integer[] to int[]
+		int[] riderIdsIntArray = Arrays.stream(riderIdsArray).mapToInt(Integer::intValue).toArray();
+
+		return riderIdsIntArray;
 	}
+
 
 	@Override
 	public int[] getRidersMountainPointClassificationRank(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+		if (!races.containsKey(raceId)) {
+			throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
+		}
+	
+		int[] raceStages = stagesRace.get(raceId);
+		int [] riderIds = getRidersGeneralClassificationRank(raceId);
+
+		int[] riderPointsRace = new int[riderIDs.size()];
+
+		Map<Integer, Integer> riderTotalPoints= new HashMap<>();
+
+
+		for (int i = 0; i < raceStages.length; i++){
+			int[] currentPoints = getRidersMountainPointsInStage(raceStages[i]);
+			for (int j = 0; j < currentPoints.length; j++){
+				riderPointsRace[j] += currentPoints[j];
+			}
+		}
+		
+		for (int i = 0; i < riderIds.length; i++) {
+			if (riderPointsRace[i] != 0) {
+				riderTotalPoints.put(riderIds[i], riderPointsRace[i]);
+			}
+		}
+		Set<Integer> riderIdsSet = riderTotalPoints.keySet();
+		Integer[] riderIdsArray = riderIdsSet.toArray(new Integer[0]);
+
+		// Convert Integer[] to int[]
+		int[] riderIdsIntArray = Arrays.stream(riderIdsArray).mapToInt(Integer::intValue).toArray();
+
+		return riderIdsIntArray;
 	}
 
 }

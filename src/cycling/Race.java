@@ -3,12 +3,14 @@ package cycling;
 //import java.util.Date;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Race implements Serializable {
 	private String name;
 	private int id;
 	private String description;
 	private static int RaceIDCounter = 0;
+	//private List<Stage> stagesinrace;
 	
 
 	public Race(String name, String description, int id) {
@@ -19,6 +21,7 @@ public class Race implements Serializable {
 	public Race(String name, String description) {
 		this.name = name;
 		this.description = description;
+		//this.stagesinrace = new List<Stage>;
 	}
 
 	public String getName() {
@@ -31,6 +34,10 @@ public class Race implements Serializable {
 	public int getId(){
 		return id;
 	}
+
+	// public void addStage(Stage stage){
+	// 	stagesinrace.put()
+	// }
 
 	
 

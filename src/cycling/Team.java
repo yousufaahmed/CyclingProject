@@ -2,6 +2,8 @@ package cycling;
 
 import java.io.Serializable;
 
+// TODO
+
 public class Team implements Serializable{
     private String name;
     private String description;

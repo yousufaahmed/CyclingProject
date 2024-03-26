@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TO DO:
+// TODO:
 
 // CREATE A CLASSES UML DIAGRAM
-// ADD SOME SORT OF INHERITANCE - DONE 🤠
+// ADD inheritance to every class?? They are all similar
 // ADD EXCEPTION HANDLING
 // ADD CLASS DOCUMENTATION USING /** */
 // ADD COMMENTS
@@ -32,6 +32,8 @@ import java.util.Map;
 public class CyclingPortalImpl implements CyclingPortal {
 
 	// not the most efficient...
+
+	// Variables, Arrays, Arraylists, and Hashmaps to store all the data from  the methods
 	private static int CPIDCounter = 0;
 	private static int raceIDCounter = 0;
 	private static int stageIDCounter = 0;
@@ -58,6 +60,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 /////////////////////////////////////////////////////
 
+	// Methods to check if the race, Stage or team name exist in the hashmaps
 	private boolean raceNameExists(String name) {
 		for (Race existingRace : races.values()) {
 			if (existingRace.getName() == name) {
@@ -85,8 +88,8 @@ public class CyclingPortalImpl implements CyclingPortal {
 		return false;
 	}
 
+	// Checks if 2 riders times are 'close' together for the adjusted time
 	private boolean isCloseTogether(LocalTime time1, LocalTime time2) {
-        // Assuming "close together" means less than one second difference
         return Math.abs(time1.toNanoOfDay() - time2.toNanoOfDay()) <= 1_000_000_000L;
     }
 
@@ -100,6 +103,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public int createRace(String name, String description) throws IllegalNameException, InvalidNameException {
+
 		// Check for invalid name
         if (name == null || name.trim().isEmpty() || name.length() > 30 || name.contains(" ")) {
             throw new InvalidNameException("name not valid");
@@ -109,10 +113,12 @@ public class CyclingPortalImpl implements CyclingPortal {
         if (raceNameExists(name)) {
             throw new IllegalNameException("name already exists");
         }
-        // create raceID and add to list
+
+        // Create a new raceID and add it to the list
 		int raceId = ++raceIDCounter;
         raceIDs.add(raceId);
-		// Create a Race object and associate it with the raceId
+
+		// Map a new Race to a raceID
 		Race race = new Race(name, description, raceId);
 		races.put(raceId, race);
 		racenameid.put(name,raceId);
@@ -122,10 +128,12 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public String viewRaceDetails(int raceId) throws IDNotRecognisedException {
+
 		if (!races.containsKey(raceId)) {
             throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
         }
 
+		// Fetches information from the corresponding race
         Race race = races.get(raceId);
         String name = race.getName();
         String description = race.getDescription();
@@ -137,6 +145,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 	@Override
 	// NEED TO UPDATE IT LATER
 	public void removeRaceById(int raceId) throws IDNotRecognisedException {
+
 		if (!races.containsKey(raceId)) {
 			throw new IDNotRecognisedException("Race with ID " + raceId + " not found.");
 		}
@@ -182,13 +191,16 @@ public class CyclingPortalImpl implements CyclingPortal {
 			throw new InvalidLengthException("Invalid stage length: " + length);
 		}
 
-		// Increment the nextStageId for the next stage
+        // Create a new stageID and add it to the list
 		int stageId = ++stageIDCounter;
 		stageIDs.add(stageId);
+		
 		// Map the stage to the race
 		Stage stage = new Stage(stageName, description, length, startTime, type);
 		stages.put(stageId, stage);
 		
+		// Makes a new array of length + 1 and replaces it in the hashmap
+		// which maps the Race to the [stages]
 		if (getNumberOfStages(raceId) != 0){
 			int[] Originalarray = stagesRace.get(raceId);
 			int[] newArray = Arrays.copyOf(Originalarray,Originalarray.length + 1);
@@ -199,7 +211,6 @@ public class CyclingPortalImpl implements CyclingPortal {
 			stagesRace.put(raceId, newArray);
 		}
 
-		// Return the unique ID of the stage
 		return stageId;
 	}
 
@@ -210,6 +221,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 			throw new IDNotRecognisedException("Race ID not recognized: " + raceId);
 		}
 		
+		// Gets the array of stages from the hashmap
 		int[] stagesArr = stagesRace.get(raceId);
 
 		return stagesArr;
@@ -222,6 +234,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
 		}
 
+		// First gets the specific stage, then gets its information
 		Stage stage = stages.get(stageId);
 		double length = stage.getlength();
 		return length;
@@ -248,19 +261,16 @@ public class CyclingPortalImpl implements CyclingPortal {
 			}
 		
 			if (indexToRemove != -1) {
-				// Create a new array with size - 1
+				// Creates a new array with size - 1
 				int[] newArray = new int[array.length - 1];
 		
-				// Copy the elements before the target value
+				// Copies the elements before the target value
 				System.arraycopy(array, 0, newArray, 0, indexToRemove);
 		
-				// Copy the elements after the target value
+				// Copies the elements after the target value
 				System.arraycopy(array, indexToRemove + 1, newArray, indexToRemove, array.length - indexToRemove - 1);
-		
-				// Update the array associated with the key
 				stagesRace.put(entry.getKey(), newArray);
 		
-				// Exit the loop after deletion
 				break;
 			}
 		}
@@ -277,12 +287,10 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 		Stage stage = stages.get(stageId);
 
-		// Check if the stage is in a valid state
 		if (stage.getState() == StageState.READY) {
 			throw new InvalidStageStateException("Stage is in 'waiting for results' state and cannot be modified.");
 		}            
 
-		// Check if the stage type allows climb checkpoints
 		if (stage.gettype() == StageType.TT) {
 			throw new InvalidStageTypeException("Time-trial stages cannot contain any checkpoint.");
 		}
@@ -298,7 +306,8 @@ public class CyclingPortalImpl implements CyclingPortal {
 		ClimbCheckpoints checkpoint = new ClimbCheckpoints(location, type, averageGradient, length);
 		climbCheckpoints.put(checkpointId, checkpoint);
 
-		// Add the checkpoint to the stage
+		// Add the checkpoint to the stage by creating a new array and
+		// replacing the old array
 		int[] stageCheckpoints = getStageCheckpoints(stageId);
 		if (stageCheckpoints.length != 0){
 			int[] Originalarray = checkpointsStages.get(stageId);
@@ -310,7 +319,6 @@ public class CyclingPortalImpl implements CyclingPortal {
 			checkpointsStages.put(stageId, newArray);
 		}
 
-		// Return the ID of the created checkpoint
 		return checkpointId;
 	}
 
@@ -324,17 +332,14 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 		Stage stage = stages.get(stageId);
 
-		// Check if the stage is in a valid state
 		if (stage.getState() == StageState.READY) {
 			throw new InvalidStageStateException("Stage is in 'waiting for results' state and cannot be modified.");
 		}            
 
-		// Check if the stage type allows climb checkpoints
 		if (stage.gettype() == StageType.TT) {
 			throw new InvalidStageTypeException("Time-trial stages cannot contain any checkpoint.");
 		}
 
-		// Check if the location is within the bounds of the stage length
 		if (location < 0 || location > stage.getlength()) {
 			throw new InvalidLocationException("Location is out of bounds of the stage length.");
 		}
@@ -371,6 +376,9 @@ public class CyclingPortalImpl implements CyclingPortal {
 		climbCheckpoints.remove(checkpointId);
 		ISprintCheckpoints.remove(checkpointId);
 
+		// MAKE A NEW FUNCTION FOR THIS BECAUSE IT IS REPEATED A FEW TIMES IN removeStage, removeCheckpoint..
+
+		// Removes the specific value from the hashmap value array
 		for (Map.Entry<Integer, int[]> entry : checkpointsStages.entrySet()) {
 			int[] array = entry.getValue();
 			int indexToRemove = -1;
@@ -382,19 +390,10 @@ public class CyclingPortalImpl implements CyclingPortal {
 			}
 	
 			if (indexToRemove != -1) {
-				// Create a new array with size - 1
 				int[] newArray = new int[array.length - 1];
-	
-				// Copy the elements before the target value
 				System.arraycopy(array, 0, newArray, 0, indexToRemove);
-	
-				// Copy the elements after the target value
 				System.arraycopy(array, indexToRemove + 1, newArray, indexToRemove, array.length - indexToRemove - 1);
-	
-				// Update the array associated with the key
 				checkpointsStages.put(entry.getKey(), newArray);
-	
-				// Exit the loop after deletion
 				break;
 			}
 		}
@@ -403,20 +402,17 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	@Override
 	public void concludeStagePreparation(int stageId) throws IDNotRecognisedException, InvalidStageStateException {
-		// Check if the stage ID is recognized
 		if (!stages.containsKey(stageId)) {
 			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
 		}
 	
-		// Retrieve the stage object
 		Stage stage = stages.get(stageId);
 	
-		// Check if the stage is not already in "waiting for results" state
 		if (stage.getState() == StageState.WAITING_FOR_RESULTS) {
 			throw new InvalidStageStateException("Stage is already in 'waiting for results' state.");
 		}
 	
-		// Update the state of the stage to "waiting for results"
+		// Updates the state of the stage to "waiting for results"
 		stage.setState();
 	}
 
@@ -446,15 +442,15 @@ public class CyclingPortalImpl implements CyclingPortal {
             throw new IllegalNameException("name already exists");
         }
 
-        // create raceID and add to list
-		int teamId = ++teamIDCounter;
-        teamIDs.add(teamId);
+        // Creates teamID and adds to list
+		int teamID = ++teamIDCounter;
+        teamIDs.add(teamID);
 
-		// Create a Race object and associate it with the raceId
+		// Create a Team object and associate it with the teamID
 		Team team = new Team(name, description);
-		teams.put(teamId, team);
+		teams.put(teamID, team);
 
-        return teamId;
+        return teamID;
 	}
 
 	@Override
@@ -499,11 +495,11 @@ public class CyclingPortalImpl implements CyclingPortal {
 			throw new IllegalArgumentException("Invalid name or invalid year of birth, please try again.");
 		}
 
-		// create raceID and add to list
+		// Create raceID and add to list
 		int riderId = ++riderIDCounter;
 		riderIDs.add(riderId);
   
-		// Create a Race object and associate it with the raceId
+		// Create a Race object and map it to the raceId
 		Rider rider = new Rider(name, yearOfBirth);
 		riders.put(riderId, rider);
 
@@ -518,6 +514,8 @@ public class CyclingPortalImpl implements CyclingPortal {
 		}
 	
 		riders.remove(riderId);
+
+		// AGAIN MAKE ANOTHER FUNCTION FOR THIS
 
 		for (Map.Entry<Integer, int[]> entry : teamRiders.entrySet()) {
 			int[] array = entry.getValue();
@@ -555,7 +553,6 @@ public class CyclingPortalImpl implements CyclingPortal {
 	public void registerRiderResultsInStage(int stageId, int riderId, LocalTime... checkpoints)
 			throws IDNotRecognisedException, DuplicatedResultException, InvalidCheckpointTimesException,InvalidStageStateException {
     
-		// Step 2: Check if the stage ID is recognized
 		if (!stages.containsKey(stageId)) {
 			throw new IDNotRecognisedException("Stage ID not recognized: " + stageId);
 		}
@@ -565,23 +562,19 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 		Stage stage = stages.get(stageId);
 		
-		// Step 3: Ensure the stage is in "waiting for results" state
 		if (stage.getState() != StageState.WAITING_FOR_RESULTS) {
 			throw new InvalidStageStateException("Stage is not in 'waiting for results' state.");
 		}
 		
-		// Step 4: Check if the rider has already registered a result for the stage
 		if (stage.hasResultForRider(riderId)) {
 			throw new DuplicatedResultException("Rider already has a result for the stage.");
 		}
 		
-		// Step 5: Verify if the length of checkpointTimes is valid
 		int expectedCheckpointCount = getStageCheckpoints(stageId).length + 2; // Add 2 for start and finish
 		if (checkpoints.length != expectedCheckpointCount) {
 			throw new InvalidCheckpointTimesException("Invalid number of checkpoint times."+ checkpoints.length + "!=" + expectedCheckpointCount);
 		}
 		
-		// Step 6: Record the rider's times for each checkpoint
 		stage.recordRiderResults(riderId, checkpoints);
 
 	}
@@ -604,14 +597,14 @@ public class CyclingPortalImpl implements CyclingPortal {
 			return new LocalTime[0];
 		}
 
+		// Takes the first and last checkpoint times to get the elapsed time
 		LocalTime firstResult = riderResults[0];
         LocalTime lastResult = riderResults[riderResults.length - 1];
 		int elapsedHours = lastResult.getHour() - firstResult.getHour();
 		int elapsedMinutes = lastResult.getMinute() - firstResult.getMinute();
 		int elapsedSeconds = lastResult.getSecond() - firstResult.getSecond();
 
-		
-
+		// TODO sri add this comment
 		if (elapsedSeconds < 0) {
 			elapsedMinutes--;
 			elapsedSeconds += 60;
@@ -621,6 +614,8 @@ public class CyclingPortalImpl implements CyclingPortal {
 			elapsedMinutes += 60;
 		}
 
+		// Combinea all the individual hours minutes seconds into one LocalTime variable, 
+		// and adds the elapsed time to the last index
         LocalTime elapsedtime =  LocalTime.of(elapsedHours, elapsedMinutes, elapsedSeconds);
 		LocalTime[] resultsWithElapsed = new LocalTime[riderResults.length + 1];
 		System.arraycopy(riderResults, 0, resultsWithElapsed, 0, riderResults.length);

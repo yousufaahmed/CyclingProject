@@ -1,5 +1,6 @@
 package cycling;
 
+// TODO
 public class ClimbCheckpoints extends Checkpoints{
 
   private Double location;

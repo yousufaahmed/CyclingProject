@@ -2,6 +2,8 @@ package cycling;
 
 import java.io.Serializable;
 
+// TODO
+
 // MAYBE CHANGE THE ++RiderIDCounter to another hashmap like the other classes
 
 public class Rider implements Serializable{

@@ -66,7 +66,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	private boolean stageNameExists(String name) {
 		for (Stage existingStage : stages.values()) {
-			if (existingStage.getstageName() == name) {
+			if (existingStage.getName() == name) {
 				return true;
 			}
 		}
@@ -75,7 +75,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 
 	private boolean teamNameExists(String name) {
 		for (Stage existingStage : stages.values()) {
-			if (existingStage.getstageName() == name) {
+			if (existingStage.getName() == name) {
 				return true;
 			}
 		}
@@ -279,7 +279,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		}            
 
 		// Check if the stage type allows climb checkpoints
-		if (stage.gettype() == StageType.TT) {
+		if (stage.getType() == StageType.TT) {
 			throw new InvalidStageTypeException("Time-trial stages cannot contain any checkpoint.");
 		}
 
@@ -326,7 +326,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		}            
 
 		// Check if the stage type allows climb checkpoints
-		if (stage.gettype() == StageType.TT) {
+		if (stage.getType() == StageType.TT) {
 			throw new InvalidStageTypeException("Time-trial stages cannot contain any checkpoint.");
 		}
 

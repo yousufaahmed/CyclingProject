@@ -26,6 +26,7 @@ import java.util.Map;
 // CREATE THE COVER SHEET WITH WHAT WE HAVE DONE INDIVIDUALLY
 // LOOK FOR CODE REPETITION AND TRY TO MAKE REUSABLE CODE
 // MAKE A README FILE
+// ADD POLYMORPHISM
 
 // create array lists to store all riders, teams, stages, checkpoints etc
 
@@ -72,7 +73,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	private boolean stageNameExists(String name) {
 		for (Stage existingStage : stages.values()) {
-			if (existingStage.getstageName() == name) {
+			if (existingStage.getName() == name) {
 				return true;
 			}
 		}
@@ -81,7 +82,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 	private boolean teamNameExists(String name) {
 		for (Stage existingStage : stages.values()) {
-			if (existingStage.getstageName() == name) {
+			if (existingStage.getName() == name) {
 				return true;
 			}
 		}
@@ -291,7 +292,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 			throw new InvalidStageStateException("Stage is in 'waiting for results' state and cannot be modified.");
 		}            
 
-		if (stage.gettype() == StageType.TT) {
+		if (stage.getType() == StageType.TT) {
 			throw new InvalidStageTypeException("Time-trial stages cannot contain any checkpoint.");
 		}
 
@@ -336,7 +337,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 			throw new InvalidStageStateException("Stage is in 'waiting for results' state and cannot be modified.");
 		}            
 
-		if (stage.gettype() == StageType.TT) {
+		if (stage.getType() == StageType.TT) {
 			throw new InvalidStageTypeException("Time-trial stages cannot contain any checkpoint.");
 		}
 
@@ -746,7 +747,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 		Stage stage = stages.get(stageId);
 
-		StageType stageType = stage.gettype();
+		StageType stageType = stage.getType();
 
 		if (ridersRank == null || ridersRank.length == 0 || !(stageType == StageType.FLAT || stageType == StageType.TT)){
 			return new int[0];
@@ -796,7 +797,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 		Stage stage = stages.get(stageId);
 
-		StageType stageType = stage.gettype();
+		StageType stageType = stage.getType();
 
 		if (ridersRank == null || ridersRank.length == 0 || !(stageType == StageType.MEDIUM_MOUNTAIN || stageType == StageType.HIGH_MOUNTAIN)){
 			return new int[0];

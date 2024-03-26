@@ -2,25 +2,25 @@ package cycling;
 
 import java.io.Serializable;
 
-public class Rider implements Serializable{
+public class Rider extends Cycling implements Serializable{
 
     /*
      * Class for the Riders
      */
 
-    private String name;
     private int yearOfBirth;
 
+    // check this
     public Rider(String name, int yearOfBirth){
-        this.name = name;
+        super(name, name);
         this.yearOfBirth = yearOfBirth;
-    }
-
-    public String getName(){
-        return name;
     }
 
     public int getYearOfBirth(){
         return yearOfBirth;
+    }
+
+    public void setYearOfBirth(int yearOfBirth){
+        this.yearOfBirth = yearOfBirth;
     }
 }

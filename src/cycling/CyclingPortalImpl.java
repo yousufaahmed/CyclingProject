@@ -22,7 +22,6 @@ import java.util.Map;
 // ADD COMMENTS
 // CREATE THE COVER SHEET WITH WHAT WE HAVE DONE INDIVIDUALLY
 // LOOK FOR CODE REPETITION AND TRY TO MAKE REUSABLE CODE
-// MAKE A README FILE
 // ADD POLYMORPHISM
 
 // create array lists to store all riders, teams, stages, checkpoints etc

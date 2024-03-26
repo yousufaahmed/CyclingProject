@@ -119,7 +119,7 @@ public class CyclingPortalImpl implements CyclingPortal {
         raceIDs.add(raceId);
 
 		// Map a new Race to a raceID
-		Race race = new Race(name, description, raceId);
+		Race race = new Race(name, description);
 		races.put(raceId, race);
 		racenameid.put(name,raceId);
 

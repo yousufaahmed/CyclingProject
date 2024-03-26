@@ -6,6 +6,11 @@ import java.io.Serializable;
 
 public class Checkpoints implements Serializable{
 
+	/*
+	 * Parent class for the types of checkpoints 
+	 * Intermediate Sprint and Categorised climb
+	 */
+
     private Double location;
 
     public Checkpoints(Double location){

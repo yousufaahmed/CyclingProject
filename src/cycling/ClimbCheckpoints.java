@@ -3,6 +3,10 @@ package cycling;
 // TODO
 public class ClimbCheckpoints extends Checkpoints{
 
+  /*
+   * Class for Categorised Climb Checkpoints
+   */
+
   private Double location;
   private CheckpointType type;
   private Double averageGradient;

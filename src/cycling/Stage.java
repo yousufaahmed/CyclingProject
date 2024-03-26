@@ -5,11 +5,11 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-// TODO
-
-// import javax.swing.plaf.nimbus.State;
 public class Stage implements Serializable{
+
+	/*
+	 * Class for the Stages
+	 */
 
 	private String stageName;
 	private String description;
@@ -54,12 +54,14 @@ public class Stage implements Serializable{
 		return state;
 	}
 
+	// Default state is WAITING_FOR_RESULTS but if all parameters are entered
+	// the state is set to READY
 	public void setState() {
         this.state = StageState.WAITING_FOR_RESULTS;
     }
 
 	public void recordRiderResults(int riderId, LocalTime... checkpointTimes) {
-        // Record the rider's checkpoint times
+        // Record the rider's checkpoint times into the riderResultsMap hashmap
         List<LocalTime> times = List.of(checkpointTimes);
         riderResultsMap.put(riderId, times);
     }
@@ -68,6 +70,7 @@ public class Stage implements Serializable{
         return riderResultsMap.containsKey(riderId);
     }
 
+	// Gets the results from the riderResultsMap and puts it into a list
 	public LocalTime[] getRiderResult(int riderId) {
 		List<LocalTime> results = riderResultsMap.getOrDefault(riderId, List.of());
         return results.toArray(new LocalTime[0]);
@@ -75,54 +78,6 @@ public class Stage implements Serializable{
     }
 
 	public void removeRiderResultsInStage(int riderId) {
-        
         riderResultsMap.remove(riderId);
     }
-	
-
-
-    // @Override
-	// public double getStageLength(int stageId) throws IDNotRecognisedException {
-	// 	// TODO Auto-generated method stub
-	// 	return 0;
-	// }
-
-	// @Override
-	// public void removeStageById(int stageId) throws IDNotRecognisedException {
-	// 	// TODO Auto-generated method stub
-
-	// }
-
-	// @Override
-	// public int addCategorizedClimbToStage(int stageId, Double location, CheckpointType type, Double averageGradient,
-	// 		Double length) throws IDNotRecognisedException, InvalidLocationException, InvalidStageStateException,
-	// 		InvalidStageTypeException {
-	// 	// TODO Auto-generated method stub
-	// 	return 0;
-	// }
-
-	// @Override
-	// public int addIntermediateSprintToStage(int stageId, double location) throws IDNotRecognisedException,
-	// 		InvalidLocationException, InvalidStageStateException, InvalidStageTypeException {
-	// 	// TODO Auto-generated method stub
-	// 	return 0;
-	// }
-
-	// @Override
-	// public void removeCheckpoint(int checkpointId) throws IDNotRecognisedException, InvalidStageStateException {
-	// 	// TODO Auto-generated method stub
-
-	// }
-
-	// @Override
-	// public void concludeStagePreparation(int stageId) throws IDNotRecognisedException, InvalidStageStateException {
-	// 	// TODO Auto-generated method stub
-
-	// }
-
-	// @Override
-	// public int[] getStageCheckpoints(int stageId) throws IDNotRecognisedException {
-	// 	// TODO Auto-generated method stub
-	// 	return null;
-	// }
 }

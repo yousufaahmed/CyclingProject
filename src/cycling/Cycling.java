@@ -14,6 +14,10 @@ public class Cycling {
         this.description = description;
     }
 
+    public Cycling(String name){
+        this.name = name;
+    }
+
     public String getName(){
         return name;
     }

@@ -12,7 +12,7 @@ public class Rider extends Cycling implements Serializable{
 
     // check this
     public Rider(String name, int yearOfBirth){
-        super(name, name);
+        super(name);
         this.yearOfBirth = yearOfBirth;
     }
 

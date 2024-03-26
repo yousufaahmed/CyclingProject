@@ -1,7 +1,6 @@
 package cycling;
 
 import java.io.FileOutputStream;
-
 import java.util.ArrayList;
 import java.io.IOException;
 import java.time.LocalTime;
@@ -19,9 +18,7 @@ import java.util.Map;
 // TODO:
 
 // CREATE A CLASSES UML DIAGRAM
-// ADD inheritance to every class?? They are all similar
 // ADD EXCEPTION HANDLING
-// ADD CLASS DOCUMENTATION USING /** */
 // ADD COMMENTS
 // CREATE THE COVER SHEET WITH WHAT WE HAVE DONE INDIVIDUALLY
 // LOOK FOR CODE REPETITION AND TRY TO MAKE REUSABLE CODE

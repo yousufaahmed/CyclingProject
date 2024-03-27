@@ -219,7 +219,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		}
 
 		Stage stage = stages.get(stageId);
-		double length = stage.getlength();
+		double length = stage.getLength();
 		return length;
 	}
 
@@ -284,7 +284,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		}
 
 		// Check if the location is within the bounds of the stage length
-		if (location < 0 || location > stage.getlength()) {
+		if (location < 0 || location > stage.getLength()) {
 			throw new InvalidLocationException("Location is out of bounds of the stage length.");
 		}
 
@@ -331,7 +331,7 @@ public class BadMiniCyclingPortalImpl implements MiniCyclingPortal {
 		}
 
 		// Check if the location is within the bounds of the stage length
-		if (location < 0 || location > stage.getlength()) {
+		if (location < 0 || location > stage.getLength()) {
 			throw new InvalidLocationException("Location is out of bounds of the stage length.");
 		}
 

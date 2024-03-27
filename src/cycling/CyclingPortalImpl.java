@@ -233,7 +233,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 
 		// First gets the specific stage, then gets its information
 		Stage stage = stages.get(stageId);
-		double length = stage.getlength();
+		double length = stage.getLength();
 		return length;
 	}
 
@@ -293,7 +293,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 		}
 
 		// Check if the location is within the bounds of the stage length
-		if (location < 0 || location > stage.getlength()) {
+		if (location < 0 || location > stage.getLength()) {
 			throw new InvalidLocationException("Location is out of bounds of the stage length.");
 		}
 
@@ -337,7 +337,7 @@ public class CyclingPortalImpl implements CyclingPortal {
 			throw new InvalidStageTypeException("Time-trial stages cannot contain any checkpoint.");
 		}
 
-		if (location < 0 || location > stage.getlength()) {
+		if (location < 0 || location > stage.getLength()) {
 			throw new InvalidLocationException("Location is out of bounds of the stage length.");
 		}
 
@@ -1049,7 +1049,6 @@ public class CyclingPortalImpl implements CyclingPortal {
 		return rankedRiderIds;
 	}
 	
-
 	@Override
 	public int[] getRidersPointClassificationRank(int raceId) throws IDNotRecognisedException {
 		// TODO Auto-generated method stub
@@ -1061,5 +1060,4 @@ public class CyclingPortalImpl implements CyclingPortal {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

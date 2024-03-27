@@ -26,11 +26,11 @@ public class Stage extends Cycling implements Serializable{
 		this.riderResultsMap = new HashMap<>();
 	}
 
-	public double getlength(){
+	public double getLength(){
 		return length;
 	}  
 
-	public LocalDateTime getstartTime(){
+	public LocalDateTime getStartTime(){
 		return startTime;
 	}
 
@@ -46,7 +46,7 @@ public class Stage extends Cycling implements Serializable{
 		this.length = length;
 	}  
 
-	public void getstartTime(LocalDateTime startTime){
+	public void setStartTime(LocalDateTime startTime){
 		this.startTime =  startTime;
 	}
 

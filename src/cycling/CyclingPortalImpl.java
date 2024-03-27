@@ -687,14 +687,12 @@ public class CyclingPortalImpl implements CyclingPortal {
 
             LocalTime[] riderTimelist = getRiderResultsInStage(stageId, a);
 			if (riderTimelist.length == 0 || riderTimelist == null){
-                LocalTime riderTime = null;
+                // LocalTime riderTime = null;
             }else{
 				LocalTime riderTime = riderTimelist[riderTimelist.length - 1];
 			    riderTimes.put(riderIDs.get(i), riderTime);
 			}
-
-           
-            //riderTimes.put(riderIDs.get(i), riderTime);
+            // riderTimes.put(riderIDs.get(i), riderTime);
         }
 
 		// Sorts the riderIDs based on their times

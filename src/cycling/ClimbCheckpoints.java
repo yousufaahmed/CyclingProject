@@ -1,6 +1,4 @@
 package cycling;
-
-
 public class ClimbCheckpoints extends Checkpoints{
 
   /**

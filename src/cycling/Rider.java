@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Rider extends Cycling implements Serializable{
 
-    /*
+    /**
      * Class for the Riders
      */
 

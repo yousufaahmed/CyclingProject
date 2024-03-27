@@ -1,7 +1,6 @@
 package cycling;
 
 import java.io.FileOutputStream;
-
 import java.util.ArrayList;
 import java.io.IOException;
 import java.time.LocalTime;

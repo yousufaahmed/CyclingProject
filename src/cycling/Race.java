@@ -1,89 +1,58 @@
 package cycling;
-//import java.time.LocalDateTime;
-//import java.util.Date;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+public class Race extends Cycling implements Serializable {
+	private List<Integer> stagesinrace;
 
-public class Race implements Serializable {
-	private String name;
-	private int id;
-	private String description;
-	private static int RaceIDCounter = 0;
-	//private List<Stage> stagesinrace;
-	
+	/**
+	 * Class for the Race
+	 * 
+	 * @author Yousuf Ahmed, Sri Guhanathan
+	 */
 
-	public Race(String name, String description, int id) {
-		this.name = name;
-		this.description = description;
-		this.id = ++RaceIDCounter;
-	}
+
+	/**
+	 * Race Constructor Class
+	 */
 	public Race(String name, String description) {
-		this.name = name;
-		this.description = description;
-		//this.stagesinrace = new List<Stage>;
+		super(name, description);
+		this.stagesinrace = new ArrayList<>();
 	}
 
-	public String getName() {
-		return name;
+	/**
+	 * Adds the stage to the race
+	 * 
+	 * @param stageId	Id of the current stage
+	 */
+	public void addstageinRace(int stageId){
+		stagesinrace.add(stageId);
 	}
 
-	public String getDescription() {
-		return description;
+	/**
+	 * Gets the stages inside of the race
+	 * 
+	 * @return array of stages in a particular race
+	 */
+	public int[] getstageinRace(){
+		int[] array = new int[stagesinrace.size()];
+		for (int i = 0; i < stagesinrace.size(); i++) {
+            array[i] = stagesinrace.get(i);
+        }
+		return array;
 	}
-	public int getId(){
-		return id;
-	}
-
-	// public void addStage(Stage stage){
-	// 	stagesinrace.put()
-	// }
-
 	
-
-
-	// @Override
-	// public int[] getRaceIds() {
-	// 	// TODO Auto-generated method stub
-	// 	return new int[] {};
-	// }
-
-	// @Override
-	// public int createRace(String name, String description) throws IllegalNameException, InvalidNameException {
-	// 	// TODO Auto-generated method stub
-	// 	return 0;
-	// }
-
-	// @Override
-	// public String viewRaceDetails(int raceId) throws IDNotRecognisedException {
-	// 	// TODO Auto-generated method stub
-	// 	return null;
-	// }
-
-	// @Override
-	// public void removeRaceById(int raceId) throws IDNotRecognisedException {
-	// 	// TODO Auto-generated method stub
-
-	// }
-
-	// @Override
-	// public int getNumberOfStages(int raceId) throws IDNotRecognisedException {
-	// 	// TODO Auto-generated method stub
-	// 	return 0;
-	// }
-
-	// @Override
-	// public int addStageToRace(int raceId, String stageName, String description, double length, LocalDateTime startTime,
-	// 		StageType type)
-	// 		throws IDNotRecognisedException, IllegalNameException, InvalidNameException, InvalidLengthException {
-	// 	// TODO Auto-generated method stub
-	// 	return 0;
-	// }
-
-	// @Override
-	// public int[] getRaceStages(int raceId) throws IDNotRecognisedException {
-	// 	// TODO Auto-generated method stub
-	// 	return null;
-	// }
+	/**
+	 * removes a particular stage from a race
+	 * 
+	 * @param stageId		Id of the stage to be removed
+	 */
+	public void removestageinRace(int stageId){
+		if (stagesinrace.contains(stageId)) {
+			// If it exists, remove it
+			stagesinrace.remove(stageId);
+		}
+	}
 }
 

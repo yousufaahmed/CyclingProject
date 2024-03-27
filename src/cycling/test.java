@@ -33,9 +33,13 @@ public class test {
         LocalDateTime startTime = LocalDateTime.of(2022, 5, 15, 14, 30);
         miniCyclingPortal.addStageToRace(1,"Theboulder","An epic climb against boulders",6.0,startTime,StageType.HIGH_MOUNTAIN);
         miniCyclingPortal.addStageToRace(1,"Theboulder2","An epic climb against boulders 2",7.0,startTime,StageType.HIGH_MOUNTAIN);
+        int[] stagesinrace = miniCyclingPortal.getRaceStages(1);
+        for (int team : stagesinrace) {
+            System.out.println("THE STAGES ARE:"+team);
+        }
 
         int nstage = miniCyclingPortal.getNumberOfStages(1);
-        System.out.println(nstage);
+        System.out.println("NUMBER OF STAGES:"+nstage);
         // miniCyclingPortal.addStageToRace(1,"Theboulder3","An epic climb against boulders 3",7.5,startTime,StageType.HIGH_MOUNTAIN);
         miniCyclingPortal.removeStageById(1);
         int nostage = miniCyclingPortal.getNumberOfStages(1);
@@ -53,7 +57,7 @@ public class test {
         miniCyclingPortal.createTeam("StrawCaps","group of pirates with caps");
         int[] teams = miniCyclingPortal.getTeams();
         for (int team : teams) {
-            System.out.println(team);
+            System.out.println("Team number:"+team);
         }
         miniCyclingPortal.removeTeam(1);
         int[] teams2 = miniCyclingPortal.getTeams();
@@ -136,7 +140,7 @@ public class test {
             System.out.println(i);
         }
 
-        miniCyclingPortal.saveCyclingPortal("cyclingPortal");
+        //miniCyclingPortal.saveCyclingPortal("cyclingPortal");
 
 
         // LocalTime[] result2 = miniCyclingPortal.getRiderResultsInStage(2,1);

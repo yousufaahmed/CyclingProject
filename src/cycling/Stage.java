@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 public class Stage extends Cycling implements Serializable{
 
-	/*
+	/**
 	 * Class for the Stages
 	 */
 
